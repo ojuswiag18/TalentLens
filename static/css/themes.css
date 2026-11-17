@@ -1,0 +1,164 @@
+/* TalentLens — Premium Theme Variables & Animations */
+
+:root,
+[data-theme="light"] {
+  --bg: #F8FAFC;
+  --surface: #FFFFFF;
+  --surface-2: #F1F5F9;
+  --elevated: #FFFFFF;
+  --primary: #2563EB;
+  --primary-soft: rgba(37, 99, 235, 0.12);
+  --primary-gradient: linear-gradient(135deg, #2563EB, #3B82F6);
+  --accent: #7C3AED;
+  --accent-soft: rgba(124, 58, 237, 0.12);
+  --accent-gradient: linear-gradient(135deg, #7C3AED, #A78BFA);
+  --text: #0F172A;
+  --muted: #64748B;
+  --border: #E2E8F0;
+  --success: #16A34A;
+  --success-soft: rgba(22, 163, 74, 0.14);
+  --success-gradient: linear-gradient(135deg, #16A34A, #22C55E);
+  --warning: #F59E0B;
+  --warning-soft: rgba(245, 158, 11, 0.14);
+  --warning-gradient: linear-gradient(135deg, #F59E0B, #FBBF24);
+  --danger: #DC2626;
+  --danger-soft: rgba(220, 38, 38, 0.12);
+  --danger-gradient: linear-gradient(135deg, #DC2626, #F87171);
+  --nav-bg: rgba(248, 250, 252, 0.9);
+  --shadow-color: 15, 23, 42;
+  --code-bg: #F1F5F9;
+  --font-headings: "Space Grotesk", "Inter", sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+[data-theme="dark"] {
+  --bg: #080D18;
+  --surface: #111827;
+  --surface-2: #0F172A;
+  --elevated: #182235;
+  --primary: #60A5FA;
+  --primary-soft: rgba(96, 165, 250, 0.16);
+  --primary-gradient: linear-gradient(135deg, #60A5FA, #93C5FD);
+  --accent: #A78BFA;
+  --accent-soft: rgba(167, 139, 250, 0.16);
+  --accent-gradient: linear-gradient(135deg, #A78BFA, #C4B5FD);
+  --text: #F8FAFC;
+  --muted: #94A3B8;
+  --border: #263244;
+  --success: #4ADE80;
+  --success-soft: rgba(74, 222, 128, 0.16);
+  --success-gradient: linear-gradient(135deg, #4ADE80, #22C55E);
+  --warning: #FBBF24;
+  --warning-soft: rgba(251, 191, 36, 0.16);
+  --warning-gradient: linear-gradient(135deg, #FBBF24, #FCD34D);
+  --danger: #F87171;
+  --danger-soft: rgba(248, 113, 113, 0.14);
+  --danger-gradient: linear-gradient(135deg, #F87171, #FCA5A5);
+  --nav-bg: rgba(8, 13, 24, 0.9);
+  --shadow-color: 0, 0, 0;
+  --code-bg: #182235;
+  --font-headings: "Space Grotesk", "Inter", sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+/* Animations */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes progress-bar {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+@keyframes spinner-fade {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease-out both;
+}
+
+.animate-fade-in-up.delay-1 { animation-delay: 0.1s; }
+.animate-fade-in-up.delay-2 { animation-delay: 0.2s; }
+.animate-fade-in-up.delay-3 { animation-delay: 0.3s; }
+.animate-fade-in-up.delay-4 { animation-delay: 0.4s; }
+
+.animate-scale-in {
+  animation: scaleIn 0.3s ease-out both;
+}
+
+.animate-spinner-fade {
+  animation: spinner-fade 0.3s ease-out both;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus-visible for accessibility */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}

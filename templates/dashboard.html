@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — TalentLens{% endblock %}
+
+{% block content %}
+{% set a = analytics %}
+<div class="container">
+  <div class="mt-3 mb-3">
+    <a class="btn btn-ghost btn-sm" href="{{ url_for('results_page', token=request.args.get('token')) }}">← Back to Results</a>
+  </div>
+
+  <header class="page-head">
+    <h1>Analysis Dashboard</h1>
+    <p>Interactive breakdown of your resume vs the target job description.</p>
+  </header>
+
+  <!-- Metrics -->
+  <section class="grid grid-4">
+    <div class="card metric-card">
+      <div class="metric-icon">🎯</div>
+      <div class="metric-value gradient-text">{{ a.metrics.overall }}%</div>
+      <div class="metric-label">Overall Match</div>
+    </div>
+    <div class="card metric-card">
+      <div class="metric-icon">🧩</div>
+      <div class="metric-value">{{ a.metrics.skill_match }}%</div>
+      <div class="metric-label">Skill Match</div>
+    </div>
+    <div class="card metric-card">
+      <div class="metric-icon">✅</div>
+      <div class="metric-value">{{ a.metrics.matched_skills }}</div>
+      <div class="metric-label">Matched Skills</div>
+    </div>
+    <div class="card metric-card">
+      <div class="metric-icon">⚠️</div>
+      <div class="metric-value" style="color:var(--danger)">{{ a.metrics.missing_skills }}</div>
+      <div class="metric-label">Missing Skills</div>
+    </div>
+  </section>
+
+  <!-- Tabbed Content -->
+  <div class="tabs-container">
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="overview">Overview</button>
+      <button class="tab-btn" data-tab="skills">Skills</button>
+      <button class="tab-btn" data-tab="keywords">Keywords</button>
+      <button class="tab-btn" data-tab="distribution">Distribution</button>
+    </div>
+
+    <div class="tab-content active" data-tab-content="overview">
+      <section class="grid grid-2 mt-4">
+        <div class="card">
+          <h3 class="mb-3" style="font-size:1.1rem">Skill Match</h3>
+          <div class="chart-box small"><canvas id="chartSkillMatch"></canvas></div>
+        </div>
+        <div class="card">
+          <h3 class="mb-3" style="font-size:1.1rem">Compatibility Breakdown</h3>
+          <div class="chart-box"><canvas id="chartBreakdown"></canvas></div>
+        </div>
+        <div class="card">
+          <h3 class="mb-3" style="font-size:1.1rem">Skill Gaps by Importance</h3>
+          <div class="chart-box"><canvas id="chartGap"></canvas></div>
+        </div>
+        <div class="card">
+          <h3 class="mb-3" style="font-size:1.1rem">Keyword Match</h3>
+          <div class="chart-box small"><canvas id="chartKeywords"></canvas></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="tab-content" data-tab-content="skills">
+      <section class="mt-4">
+        <div class="card">
+          <h3 class="mb-3" style="font-size:1.1rem">Skill Distribution</h3>
+          <div class="chart-box"><canvas id="chartDistribution"></canvas></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="tab-content" data-tab-content="keywords">
+      <section class="mt-4">
+        <div class="card">
+          <h3 class="mb-3" style="font-size:1.1rem">Keyword Details</h3>
+          <div class="grid grid-2">
+            <div class="card">
+              <h4>Matched Keywords</h4>
+              <ul class="keyword-list">
+                {% for kw in a.breakdown.keywords_matched or [] %}
+                <li>{{ kw }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+            <div class="card">
+              <h4>Missing Keywords</h4>
+              <ul class="keyword-list">
+                {% for kw in a.breakdown.keywords_missing or [] %}
+                <li>{{ kw }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="tab-content" data-tab-content="distribution">
+      <section class="mt-4">
+        <div class="card">
+          <h3 class="mb-3" style="font-size:1.1rem">Experience & Education</h3>
+          <div class="grid grid-2">
+            <div class="card">
+              <h4>Experience Score</h4>
+              <div class="progress-container">
+                <div class="progress-fill" data-value="{{ a.breakdown.experience or 0 }}"></div>
+              </div>
+              <p class="text-center">{{ a.breakdown.experience or 0 }}%</p>
+            </div>
+            <div class="card">
+              <h4>Education Score</h4>
+              <div class="progress-container">
+                <div class="progress-fill" data-value="{{ a.breakdown.education or 0 }}"></div>
+              </div>
+              <p class="text-center">{{ a.breakdown.education or 0 }}%</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script id="dashboardData" type="application/json">{{ a | tojson }}</script>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

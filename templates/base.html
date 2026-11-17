@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}TalentLens — Resume & Job Match Analysis{% endblock %}</title>
+  <meta name="description" content="TalentLens analyzes your resume against a target job description — skill gaps, compatibility score and learning resources.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/themes.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='8' y1='8' x2='56' y2='56'%3E%3Cstop offset='0' stop-color='%232563EB'/%3E%3Cstop offset='0.5' stop-color='%2306B6D4'/%3E%3Cstop offset='1' stop-color='%237C3AED'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='28' cy='28' r='20' fill='none' stroke='url(%23g)' stroke-width='4'/%3E%3Crect x='15' y='34' width='5' height='10' rx='1.5' fill='url(%23g)' opacity='0.7'/%3E%3Crect x='22' y='26' width='5' height='18' rx='1.5' fill='url(%23g)' opacity='0.85'/%3E%3Crect x='29' y='18' width='5' height='26' rx='1.5' fill='url(%23g)'/%3E%3Cline x1='42' y1='42' x2='55' y2='55' stroke='url(%23g)' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+  {% block head %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar">
+      <div class="container navbar-inner">
+        <a class="brand" href="{{ url_for('home') }}">
+          <svg class="brand-icon" width="36" height="36" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="nav-logo-grad" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stop-color="var(--primary)"/>
+                <stop offset="0.5" stop-color="#06B6D4"/>
+                <stop offset="1" stop-color="var(--accent)"/>
+              </linearGradient>
+            </defs>
+            <circle cx="28" cy="28" r="20" stroke="url(#nav-logo-grad)" stroke-width="4" fill="none"/>
+            <rect x="15" y="34" width="5" height="10" rx="1.5" fill="url(#nav-logo-grad)" opacity="0.7"/>
+            <rect x="22" y="26" width="5" height="18" rx="1.5" fill="url(#nav-logo-grad)" opacity="0.85"/>
+            <rect x="29" y="18" width="5" height="26" rx="1.5" fill="url(#nav-logo-grad)"/>
+            <line x1="42" y1="42" x2="55" y2="55" stroke="url(#nav-logo-grad)" stroke-width="4" stroke-linecap="round"/>
+          </svg>
+          <span class="brand-text">Talent<span class="brand-accent">Lens</span></span>
+        </a>
+        <ul class="nav-links">
+          <li><a href="{{ url_for('home') }}" class="{{ 'active' if request.path == '/' else '' }}">Home</a></li>
+          <li><a href="{{ url_for('analyze_page') }}" class="{{ 'active' if request.path.startswith('/analyze') else '' }}">Analyze</a></li>
+          <li><a href="{{ url_for('resume_builder_page') }}" class="{{ 'active' if request.path.startswith('/resume-builder') else '' }}">Resume Builder</a></li>
+          <li><a href="{{ url_for('resources_page') }}" class="{{ 'active' if request.path.startswith('/resources') else '' }}">Resources</a></li>
+          <li><a href="{{ url_for('about_page') }}" class="{{ 'active' if request.path.startswith('/about') else '' }}">About</a></li>
+          <li><a href="{{ url_for('interview_page') }}" class="{{ 'active' if request.path.startswith('/interview') else '' }}">Interview</a></li>
+          <li><a href="{{ url_for('history_page') }}" class="{{ 'active' if request.path.startswith('/history') else '' }}">History</a></li>
+        </ul>
+        <div class="nav-actions">
+          <button type="button" class="theme-toggle" data-theme-toggle aria-label="Toggle theme" title="Toggle theme">
+            <span class="sun">☀️</span><span class="moon">🌙</span><span class="label">Light Mode</span>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <main>
+      <div id="page-content" class="page-transition">
+        {% block content %}{% endblock %}
+      </div>
+    </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+<span>© 2026 TalentLens — Career readiness platform.</span>
+<span>Analyze → Match → Identify Gaps → Learn → Improve</span>
+    </div>
+  </footer>
+
+<!-- Resource modal -->
+  <div class="modal-overlay" id="resourceModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h3>Learning Resources</h3>
+        <button type="button" class="modal-close" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- ATE Explanation Modal -->
+  <div class="ats-explanation-modal" id="atsExplanationModal">
+    <div class="ats-explanation-content">
+      <h3>What does this score mean?</h3>
+      <p>The TalentLens compatibility score estimates how closely your resume aligns with the selected job description. It considers relevant skills, keywords, experience, projects, and other job-specific information identified during the analysis.</p>
+      <div class="score-rules">
+        <div class="score-rule strong">80–100 — Strong Match: Your resume aligns well with the job requirements.</div>
+        <div class="score-rule moderate">60–79 — Moderate Match: Your resume has relevant experience, but some important requirements may be missing.</div>
+        <div class="score-rule low">40–59 — Needs Improvement: Several important skills or keywords may be missing.</div>
+        <div class="score-rule low">Below 40 — Low Match: Your resume has limited alignment with the current job description.</div>
+      </div>
+      <button type="button" class="ats-explanation-close" aria-label="Close">&times;</button>
+    </div>
+  </div>
+
+  <!-- Loading overlay -->
+  <div class="overlay" id="loadingOverlay">
+    <div class="overlay-card">
+      <div class="spinner"></div>
+      <h3>Analyzing Resume</h3>
+      <ul class="pipeline-steps"></ul>
+    </div>
+  </div>
+
+  <!-- Simulation Modal (outside page-content to avoid transform/opacity containment) -->
+  <div class="sim-modal-overlay" id="simModal">
+    <div class="sim-modal">
+      <div class="sim-modal-head">
+        <div class="sim-modal-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+          <span>Improvement Simulation</span>
+        </div>
+        <button type="button" class="sim-modal-close" id="simModalClose" aria-label="Close">&times;</button>
+      </div>
+      <div class="sim-modal-body" id="simModalBody">
+        <div class="sim-loading">
+          <div class="spinner"></div>
+          <p>Calculating estimated improvement&hellip;</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

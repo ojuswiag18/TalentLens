@@ -1,0 +1,205 @@
+skill,resource_type,title,url,difficulty,provider
+Python,Documentation,Python Official Documentation,https://docs.python.org/3/,Beginner,Python Software Foundation
+Python,Video,Python for Everybody Full Course,https://www.youtube.com/playlist?list=PLlRFEj9H3Oj7Bp8-DfGpfAfDBiblRfl5p,Beginner,freeCodeCamp
+Python,Article,Python Crash Course: A Hands-On Introduction,https://realpython.com/python-first-steps/,Beginner,Real Python
+Python,Course,Python for Data Science,https://www.coursera.org/learn/python-data-science,Intermediate,Coursera
+SQL,Documentation,PostgreSQL Documentation,https://www.postgresql.org/docs/,Beginner,PostgreSQL
+SQL,Video,SQL Full Course for Beginners,https://www.youtube.com/watch?v=7S_tz1z_5bA,Beginner,freeCodeCamp
+SQL,Article,SQL Tutorial,https://www.w3schools.com/sql/,Beginner,W3Schools
+SQL,Playlist,Learn Advanced SQL,https://www.youtube.com/playlist?list=PLN4aKSfpk8TQJokKq_hN1TtEwAaX0jVgK,Intermediate,Learn with Sumit
+Pandas,Documentation,Pandas Documentation,https://pandas.pydata.org/docs/,Intermediate,Pandas
+Pandas,Video,Pandas Full Course for Data Science,https://www.youtube.com/watch?v=vmEHCJofslg,Intermediate,freeCodeCamp
+Pandas,Article,Pandas Tutorial: DataFrames,https://www.datacamp.com/tutorial/pandas-tutorial-dataframe,Intermediate,DataCamp
+Pandas,Course,Pandas for Data Analysis,https://www.udemy.com/course/data-analysis-with-pandas/,Intermediate,Udemy
+NumPy,Documentation,NumPy Documentation,https://numpy.org/doc/stable/,Intermediate,NumPy
+NumPy,Video,NumPy Full Course,https://www.youtube.com/watch?v=QUT1VHiLmmI,Intermediate,freeCodeCamp
+NumPy,Article,NumPy Quickstart Tutorial,https://numpy.org/doc/stable/user/quickstart.html,Beginner,NumPy
+Matplotlib,Documentation,Matplotlib Documentation,https://matplotlib.org/stable/,Intermediate,Matplotlib
+Matplotlib,Video,Matplotlib Tutorial,https://www.youtube.com/watch?v=UO98lJQ3QGI,Intermediate,Corey Schafer
+Matplotlib,Article,Matplotlib Crash Course,https://realpython.com/python-matplotlib-guide/,Intermediate,Real Python
+Seaborn,Documentation,Seaborn Documentation,https://seaborn.pydata.org/,Intermediate,Seaborn
+Seaborn,Video,Seaborn Tutorial for Data Visualization,https://www.youtube.com/watch?v=6TdDvZo8HII,Intermediate,Codebasics
+Seaborn,Article,Seaborn Guide,https://www.datacamp.com/tutorial/seaborn-python-tutorial,Intermediate,DataCamp
+Machine Learning,Documentation,scikit-learn Documentation,https://scikit-learn.org/stable/,Intermediate,scikit-learn
+Machine Learning,Video,Machine Learning Full Course,https://www.youtube.com/watch?v=i_LwzRVP7bg,Intermediate,freeCodeCamp
+Machine Learning,Article,Introduction to Machine Learning,https://developers.google.com/machine-learning/intro-to-ml,Beginner,Google Developers
+Machine Learning,Course,Machine Learning Specialization,https://www.coursera.org/specializations/machine-learning-introduction,Intermediate,Coursera
+Scikit-learn,Documentation,scikit-learn User Guide,https://scikit-learn.org/stable/user_guide.html,Intermediate,scikit-learn
+Scikit-learn,Video,Scikit-learn Full Course,https://www.youtube.com/watch?v=0B5eIE_1vpU,Intermediate,freeCodeCamp
+Scikit-learn,Article,Getting Started with scikit-learn,https://scikit-learn.org/stable/getting_started.html,Beginner,scikit-learn
+TensorFlow,Documentation,TensorFlow Documentation,https://www.tensorflow.org/learn,Intermediate,TensorFlow
+TensorFlow,Video,TensorFlow 2.0 Full Course,https://www.youtube.com/watch?v=tPYj3fFJGtk,Intermediate,freeCodeCamp
+TensorFlow,Article,TensorFlow Tutorial,https://www.tensorflow.org/tutorials,Intermediate,TensorFlow
+PyTorch,Documentation,PyTorch Documentation,https://pytorch.org/docs/stable/index.html,Intermediate,PyTorch
+PyTorch,Video,PyTorch Deep Learning Course,https://www.youtube.com/playlist?list=PLqnslRFeH2UrcDBWF5mfPGpqQDSta6VK4,Intermediate,Patrick Loeber
+PyTorch,Article,PyTorch Tutorials,https://pytorch.org/tutorials/,Intermediate,PyTorch
+Deep Learning,Documentation,Deep Learning Book,https://www.deeplearningbook.org/,Advanced,MIT Press
+Deep Learning,Video,Deep Learning Full Course,https://www.youtube.com/watch?v=aircAruvnKk,Intermediate,3Blue1Brown
+Deep Learning,Article,Deep Learning Glossary,https://developers.google.com/machine-learning/glossary,Intermediate,Google Developers
+NLP,Documentation,NLTK Documentation,https://www.nltk.org/,Intermediate,NLTK
+NLP,Video,Natural Language Processing Course,https://www.youtube.com/watch?v=fNxaJsNG3-s,Intermediate,freeCodeCamp
+NLP,Article,Introduction to NLP,https://www.datacamp.com/tutorial/introduction-to-natural-language-processing,Beginner,DataCamp
+NLTK,Documentation,NLTK Book,https://www.nltk.org/book/,Intermediate,NLTK
+NLTK,Video,NLTK Tutorial,https://www.youtube.com/watch?v=FLZvOKSCkxY,Intermediate,Sentdex
+NLTK,Article,NLTK Guide,https://realpython.com/nltk-nlp-python/,Intermediate,Real Python
+spaCy,Documentation,spaCy Documentation,https://spacy.io/usage,Intermediate,Explosion
+spaCy,Video,spaCy Course,https://www.youtube.com/watch?v=RpjYTGeyImpl,Intermediate,SpaCy
+spaCy,Article,spaCy 101,https://spacy.io/usage/spacy-101,Intermediate,Explosion
+Computer Vision,Documentation,OpenCV Documentation,https://docs.opencv.org/4.x/,Intermediate,OpenCV
+Computer Vision,Video,OpenCV Full Course,https://www.youtube.com/watch?v=oXlwWbU8l2o,Intermediate,freeCodeCamp
+Computer Vision,Article,Computer Vision Tutorial,https://www.kaggle.com/learn/computer-vision,Intermediate,Kaggle
+Statistics,Documentation,Statistics Handbook,https://www.statisticshowto.com/,Beginner,Statistics How To
+Statistics,Video,Statistics Full Course,https://www.youtube.com/watch?v=xxpc-HPKN28,Beginner,freeCodeCamp
+Statistics,Article,Statistics for Data Science,https://www.analyticsvidhya.com/blog/2017/11/beginners-guide-statistics-data-science/,Intermediate,Analytics Vidhya
+Microsoft Excel,Documentation,Excel Training Center,https://support.microsoft.com/en-us/training,Beginner,Microsoft
+Microsoft Excel,Video,Excel Full Course,https://www.youtube.com/watch?v=Vl0H-qTclOg,Intermediate,freeCodeCamp
+Microsoft Excel,Article,Excel Basics for Data Analysis,https://www.coursera.org/learn/excel-basics-data-analysis-ibm,Intermediate,Coursera
+Power BI,Documentation,Microsoft Power BI Documentation,https://learn.microsoft.com/en-us/power-bi/,Beginner,Microsoft Learn
+Power BI,Video,Power BI Full Course for Beginners,https://www.youtube.com/watch?v=AGrl-HGKpOE,Beginner,Alex The Analyst
+Power BI,Article,Power BI Beginner Guide,https://learn.microsoft.com/en-us/training/paths/data-storytelling-power-bi/,Beginner,Microsoft Learn
+Power BI,Course,Power BI for Data Analysis,https://www.coursera.org/specializations/power-bi-data-analysis,Intermediate,Coursera
+Tableau,Documentation,Tableau Training and Tutorials,https://www.tableau.com/learn/training,Beginner,Tableau
+Tableau,Video,Tableau Full Course,https://www.youtube.com/watch?v=aHaOIvR00So,Beginner,freeCodeCamp
+Tableau,Article,Tableau Tutorial for Beginners,https://www.datacamp.com/tutorial/tableau-tutorial,Beginner,DataCamp
+Docker,Documentation,Docker Documentation,https://docs.docker.com/,Intermediate,Docker
+Docker,Video,Docker Full Course,https://www.youtube.com/watch?v=fqMOX6JJhGo,Intermediate,freeCodeCamp
+Docker,Article,Docker for Beginners,https://docker-curriculum.com/,Beginner,Docker
+Docker,Course,Docker and Kubernetes Course,https://www.udemy.com/course/docker-and-kubernetes-the-complete-guide/,Intermediate,Udemy
+Kubernetes,Documentation,Kubernetes Documentation,https://kubernetes.io/docs/,Intermediate,Kubernetes
+Kubernetes,Video,Kubernetes Full Course,https://www.youtube.com/watch?v=d6WC5n9G_sM,Intermediate,freeCodeCamp
+Kubernetes,Article,Kubernetes Basics,https://kubernetes.io/docs/tutorials/kubernetes-basics/,Beginner,Kubernetes
+AWS,Documentation,AWS Documentation,https://docs.aws.amazon.com/,Beginner,Amazon Web Services
+AWS,Video,AWS Full Course,https://www.youtube.com/watch?v=ulprqHHWlng,Beginner,freeCodeCamp
+AWS,Article,AWS for Data Science,https://aws.amazon.com/getting-started/hands-on/,Beginner,Amazon Web Services
+Azure,Documentation,Microsoft Azure Documentation,https://learn.microsoft.com/en-us/azure/,Beginner,Microsoft Learn
+Azure,Video,Azure Fundamentals Full Course,https://www.youtube.com/watch?v=NKEFWyqJ5XA,Beginner,freeCodeCamp
+Azure,Article,Azure Learning Paths,https://learn.microsoft.com/en-us/training/browse/?products=azure,Beginner,Microsoft Learn
+Google Cloud Platform,Documentation,Google Cloud Documentation,https://cloud.google.com/docs,Beginner,Google Cloud
+Google Cloud Platform,Video,Google Cloud Full Course,https://www.youtube.com/watch?v=JPnoJhU5nIo,Beginner,freeCodeCamp
+Google Cloud Platform,Article,Google Cloud Skills Boost,https://www.cloudskillsboost.google/,Beginner,Google Cloud
+Git,Documentation,Git Documentation,https://git-scm.com/doc,Beginner,Git
+Git,Video,Git and GitHub Full Course,https://www.youtube.com/watch?v=RGOj5yH7evk,Beginner,freeCodeCamp
+Git,Article,Learn Git Branching,https://learngitbranching.js.org/,Beginner,Learn Git Branching
+GitHub,Documentation,GitHub Docs,https://docs.github.com/,Beginner,GitHub
+GitHub,Video,GitHub Actions Full Course,https://www.youtube.com/watch?v=R8_veQiYBjI,Intermediate,freeCodeCamp
+GitHub,Article,GitHub Skills,https://skills.github.com/,Beginner,GitHub
+Jenkins,Documentation,Jenkins Documentation,https://www.jenkins.io/doc/,Intermediate,Jenkins
+Jenkins,Video,Jenkins Full Course,https://www.youtube.com/watch?v=6YZvp2GwT0A,Intermediate,freeCodeCamp
+Jenkins,Article,Jenkins Beginner Tutorial,https://www.guru99.com/jenkins-tutorial.html,Intermediate,Guru99
+Terraform,Documentation,Terraform Documentation,https://developer.hashicorp.com/terraform/docs,Intermediate,HashiCorp
+Terraform,Video,Terraform Full Course,https://www.youtube.com/watch?v=SLB_c_ayRMo,Intermediate,freeCodeCamp
+Terraform,Article,Terraform Tutorials,https://developer.hashicorp.com/terraform/tutorials,Beginner,HashiCorp
+Linux,Documentation,Linux Command Line Guide,https://linuxcommand.org/,Beginner,Linux Command
+Linux,Video,Linux Full Course,https://www.youtube.com/watch?v=sWbUDq4S6Y8,Intermediate,freeCodeCamp
+Linux,Article,Linux Journey,https://linuxjourney.com/,Beginner,Linux Journey
+Bash,Documentation,Bash Reference Manual,https://www.gnu.org/software/bash/manual/,Intermediate,GNU
+Bash,Video,Bash Scripting Tutorial,https://www.youtube.com/watch?v=tK9Oc6AEnR4,Intermediate,freeCodeCamp
+Bash,Article,Bash Scripting Guide,https://tldp.org/LDP/abs/html/,Intermediate,TLDP
+React,Documentation,React Documentation,https://react.dev/learn,Intermediate,React
+React,Video,React Full Course,https://www.youtube.com/watch?v=bMknfKXIFA8,Intermediate,freeCodeCamp
+React,Article,React Tutorial,https://www.w3schools.com/react/,Beginner,W3Schools
+Node.js,Documentation,Node.js Documentation,https://nodejs.org/en/docs,Intermediate,Node.js
+Node.js,Video,Node.js Full Course,https://www.youtube.com/watch?v=Oe421EPjeBE,Intermediate,freeCodeCamp
+Node.js,Article,Node.js for Beginners,https://nodejs.dev/en/learn/,Beginner,Node.js
+Django,Documentation,Django Documentation,https://docs.djangoproject.com/,Intermediate,Django
+Django,Video,Django Full Course,https://www.youtube.com/watch?v=JxzZxdht-XY,Intermediate,freeCodeCamp
+Django,Article,Django Tutorial,https://docs.djangoproject.com/en/stable/intro/tutorial01/,Beginner,Django
+Flask,Documentation,Flask Documentation,https://flask.palletsprojects.com/,Intermediate,Pallets Projects
+Flask,Video,Flask Full Course,https://www.youtube.com/watch?v=Qr4QMBUPxWo,Intermediate,freeCodeCamp
+Flask,Article,Flask Tutorial,https://flask.palletsprojects.com/en/stable/tutorial/,Beginner,Pallets Projects
+FastAPI,Documentation,FastAPI Documentation,https://fastapi.tiangolo.com/,Intermediate,Tiago Montague
+FastAPI,Video,FastAPI Full Course,https://www.youtube.com/watch?v=0RS9g8Vc9gM,Intermediate,freeCodeCamp
+FastAPI,Article,FastAPI Tutorial,https://fastapi.tiangolo.com/tutorial/,Beginner,Tiago Montague
+REST APIs,Documentation,HTTP API Design Guide,https://github.com/microsoft/api-guidelines,Intermediate,Microsoft
+REST APIs,Video,REST API Crash Course,https://www.youtube.com/watch?v=-MTSQjw5DrM,Intermediate,Traversy Media
+REST APIs,Article,Introduction to REST APIs,https://www.freecodecamp.org/news/rest-api-design-best-practices-build-a-rest-api/,Beginner,freeCodeCamp
+MongoDB,Documentation,MongoDB Documentation,https://www.mongodb.com/docs/,Intermediate,MongoDB
+MongoDB,Video,MongoDB Full Course,https://www.youtube.com/watch?v=ofme2o29ngU,Intermediate,freeCodeCamp
+MongoDB,Article,MongoDB University,https://learn.mongodb.com/,Beginner,MongoDB
+PostgreSQL,Documentation,PostgreSQL Tutorial,https://www.postgresqltutorial.com/,Beginner,PostgreSQL Tutorial
+PostgreSQL,Video,PostgreSQL Full Course,https://www.youtube.com/watch?v=qw--VYLpxG4,Intermediate,freeCodeCamp
+PostgreSQL,Article,PostgreSQL Docs,https://www.postgresql.org/docs/,Beginner,PostgreSQL
+MySQL,Documentation,MySQL Documentation,https://dev.mysql.com/doc/,Beginner,MySQL
+MySQL,Video,MySQL Full Course,https://www.youtube.com/watch?v=7S_tz1z_5bA,Intermediate,freeCodeCamp
+MySQL,Article,MySQL Tutorial,https://www.mysql.com/products/community/,Beginner,MySQL
+Redis,Documentation,Redis Documentation,https://redis.io/docs/,Intermediate,Redis
+Redis,Video,Redis Full Course,https://www.youtube.com/watch?v=Hbt56gFj998,Intermediate,freeCodeCamp
+Redis,Article,Redis University,https://university.redis.com/,Beginner,Redis
+Snowflake,Documentation,Snowflake Documentation,https://docs.snowflake.com/,Intermediate,Snowflake
+Snowflake,Video,Snowflake Full Course,https://www.youtube.com/watch?v=fE0Y6uZDnG0,Intermediate,freeCodeCamp
+Snowflake,Article,Snowflake Tutorials,https://quickstarts.snowflake.com/,Beginner,Snowflake
+Apache Spark,Documentation,Apache Spark Documentation,https://spark.apache.org/docs/latest/,Advanced,Apache Spark
+Apache Spark,Video,Apache Spark Full Course,https://www.youtube.com/watch?v=_C8kWso4ne4,Intermediate,freeCodeCamp
+Apache Spark,Article,Spark Programming Guide,https://spark.apache.org/docs/latest/quick-start.html,Intermediate,Apache Spark
+PySpark,Documentation,PySpark Documentation,https://spark.apache.org/docs/latest/api/python/,Intermediate,Apache Spark
+PySpark,Video,PySpark Full Course,https://www.youtube.com/watch?v=_C8kWso4ne4,Intermediate,freeCodeCamp
+PySpark,Article,PySpark Tutorial,https://www.datacamp.com/tutorial/pyspark-tutorial,Intermediate,DataCamp
+Apache Airflow,Documentation,Airflow Documentation,https://airflow.apache.org/docs/,Advanced,Apache Airflow
+Apache Airflow,Video,Airflow Full Course,https://www.youtube.com/watch?v=AHMm1T02T7Q,Intermediate,freeCodeCamp
+Apache Airflow,Article,Airflow for Beginners,https://www.datacamp.com/tutorial/introduction-to-apache-airflow,Intermediate,DataCamp
+Apache Kafka,Documentation,Kafka Documentation,https://kafka.apache.org/documentation/,Advanced,Apache Kafka
+Apache Kafka,Video,Kafka Full Course,https://www.youtube.com/watch?v=B5j3uNBH8X4,Intermediate,freeCodeCamp
+Apache Kafka,Article,Kafka Tutorial,https://www.tutorialspoint.com/apache_kafka/index.htm,Intermediate,Tutorials Point
+Hadoop,Documentation,Hadoop Documentation,https://hadoop.apache.org/docs/current/,Advanced,Apache Hadoop
+Hadoop,Video,Hadoop Full Course,https://www.youtube.com/watch?v=1vbXmCrkT3Y,Intermediate,edureka
+Hadoop,Article,Hadoop Tutorial,https://www.datacamp.com/tutorial/hadoop-tutorial,Intermediate,DataCamp
+Data Visualization,Documentation,Storytelling with Data,https://www.storytellingwithdata.com/,Intermediate,Storytelling with Data
+Data Visualization,Video,Data Visualization Full Course,https://www.youtube.com/watch?v=TPMlZxRRa8Q,Intermediate,freeCodeCamp
+Data Visualization,Article,Data Visualization Guide,https://www.tableau.com/learn/articles/data-visualization,Beginner,Tableau
+Data Analysis,Documentation,Data Analysis with Python,https://www.kaggle.com/learn/python,Intermediate,Kaggle
+Data Analysis,Video,Data Analysis Full Course,https://www.youtube.com/watch?v=r-uOLxNrNk8,Intermediate,freeCodeCamp
+Data Analysis,Article,Introduction to Data Analytics,https://www.coursera.org/learn/data-analytics-charts,Intermediate,Coursera
+Business Analysis,Documentation,Business Analysis Body of Knowledge,https://www.iiba.org/babok-guide/,Advanced,IIBA
+Business Analysis,Video,Business Analysis Full Course,https://www.youtube.com/watch?v=uXTJvR5xLOQ,Intermediate,Invensis Learning
+Business Analysis,Article,How to Become a Business Analyst,https://www.coursera.org/articles/business-analyst,Intermediate,Coursera
+Data Engineering,Documentation,Data Engineering Guide,https://www.altexsoft.com/blog/data-engineering-guide/,Advanced,AltexSoft
+Data Engineering,Video,Data Engineering Full Course,https://www.youtube.com/watch?v=qWru-b6m050,Intermediate,freeCodeCamp
+Data Engineering,Article,Data Engineering Roadmap,https://www.kdnuggets.com/2021/08/data-engineering-beginners-guide.html,Intermediate,KDnuggets
+A/B Testing,Documentation,Google Analytics Academy,https://analytics.google.com/analytics/academy/,Intermediate,Google
+A/B Testing,Video,A/B Testing Crash Course,https://www.youtube.com/watch?v=0DZg1yNEcNM,Intermediate,CXL
+A/B Testing,Article,A/B Testing Guide,https://www.optimizely.com/optimization-glossary/ab-testing/,Beginner,Optimizely
+Time Series,Documentation,Forecasting Principles,https://otexts.com/fpp3/,Advanced,OTexts
+Time Series,Video,Time Series Analysis Course,https://www.youtube.com/watch?v=5UqDKYQw1bk,Intermediate,freeCodeCamp
+Time Series,Article,Time Series Forecasting Tutorial,https://www.datacamp.com/tutorial/time-series-analysis-tutorial,Intermediate,DataCamp
+Recommendation Systems,Documentation,Recommender Systems Handbook,https://www.coursera.org/learn/recommender-systems,Advanced,Coursera
+Recommendation Systems,Video,Recommender Systems Full Course,https://www.youtube.com/watch?v=oNqHADt8nBA,Intermediate,freeCodeCamp
+Recommendation Systems,Article,Recommender Systems Tutorial,https://www.kaggle.com/learn/recommendation-systems,Intermediate,Kaggle
+LangChain,Documentation,LangChain Documentation,https://python.langchain.com/docs/,Intermediate,LangChain
+LangChain,Video,LangChain Full Course,https://www.youtube.com/watch?v=aywZrzNaKjs,Intermediate,freeCodeCamp
+LangChain,Article,LangChain Quickstart,https://python.langchain.com/docs/get_started/quickstart,Intermediate,LangChain
+LLM,Documentation,Hugging Face Course,https://huggingface.co/learn/nlp-course,Intermediate,Hugging Face
+LLM,Video,Large Language Models Course,https://www.youtube.com/watch?v=zjkBMFhNj_g,Intermediate,freeCodeCamp
+LLM,Article,Introduction to LLMs,https://developers.google.com/machine-learning/resources/intro-llms,Beginner,Google Developers
+MLflow,Documentation,MLflow Documentation,https://mlflow.org/docs/latest/,Advanced,MLflow
+MLflow,Video,MLflow Tutorial,https://www.youtube.com/watch?v=1y4k-a_YBRI,Intermediate,Data Talks Club
+MLflow,Article,MLflow Tracking Guide,https://mlflow.org/docs/latest/tracking.html,Intermediate,MLflow
+D3.js,Documentation,D3.js Documentation,https://d3js.org/,Advanced,D3
+D3.js,Video,D3.js Full Course,https://www.youtube.com/watch?v=C4t6qfHZ6To,Intermediate,Curran Kelleher
+D3.js,Article,D3.js Tutorial,https://www.freecodecamp.org/news/how-to-get-started-with-d3-and-data-visualization/,Beginner,freeCodeCamp
+Plotly,Documentation,Plotly Documentation,https://plotly.com/python/,Intermediate,Plotly
+Plotly,Video,Plotly Dash Full Course,https://www.youtube.com/watch?v=hTrKIpWlqCw,Intermediate,freeCodeCamp
+Plotly,Article,Plotly Python Guide,https://plotly.com/python/getting-started/,Beginner,Plotly
+C++,Documentation,cppreference,https://en.cppreference.com/,Intermediate,cppreference
+C++,Video,C++ Full Course,https://www.youtube.com/watch?v=vLnPwxZdW4Y,Intermediate,freeCodeCamp
+C++,Article,Learn C++ Tutorial,https://www.learncpp.com/,Beginner,LearnCpp
+Java,Documentation,Java Documentation,https://docs.oracle.com/en/java/,Intermediate,Oracle
+Java,Video,Java Full Course,https://www.youtube.com/watch?v=grEKMHGYyns,Intermediate,freeCodeCamp
+Java,Article,Java Tutorial,https://www.w3schools.com/java/,Beginner,W3Schools
+JavaScript,Documentation,MDN JavaScript Guide,https://developer.mozilla.org/en-US/docs/Web/JavaScript,Intermediate,MDN
+JavaScript,Video,JavaScript Full Course,https://www.youtube.com/watch?v=PkZNo7MFNFg,Intermediate,freeCodeCamp
+JavaScript,Article,JavaScript Tutorial,https://www.javascripttutorial.net/,Beginner,JavaScript Tutorial
+TypeScript,Documentation,TypeScript Handbook,https://www.typescriptlang.org/docs/,Intermediate,TypeScript
+TypeScript,Video,TypeScript Full Course,https://www.youtube.com/watch?v=gp5H0Vw39yw,Intermediate,freeCodeCamp
+TypeScript,Article,TypeScript for Beginners,https://www.freecodecamp.org/news/learn-typescript-in-5-minutes/,Beginner,freeCodeCamp
+R,Documentation,R Documentation,https://www.r-project.org/other-docs.html,Intermediate,R Project
+R,Video,R Programming Full Course,https://www.youtube.com/watch?v=_V8eKsto3Ug,Intermediate,freeCodeCamp
+R,Article,R for Data Science,https://r4ds.had.co.nz/,Intermediate,R4DS
+Go,Documentation,Go Documentation,https://go.dev/doc/,Intermediate,Go
+Go,Video,Go Full Course,https://www.youtube.com/watch?v=YS4e4q9oBaU,Intermediate,freeCodeCamp
+Go,Article,Learn Go Tutorial,https://go.dev/tour/welcome/1,Beginner,Go
+Data Warehousing,Documentation,Data Warehouse Guide,https://www.ibm.com/topics/data-warehouse,Intermediate,IBM
+Data Warehousing,Video,Data Warehousing Full Course,https://www.youtube.com/watch?v=J326LIUrZM8,Intermediate,freeCodeCamp
+Data Warehousing,Article,Data Warehouse Tutorial,https://www.simplilearn.com/what-is-data-warehousing-concepts-tools-examples-article,Intermediate,Simplilearn
+ETL,Documentation,ETL Pipeline Guide,https://airflow.apache.org/docs/apache-airflow/stable/tutorial/fundamentals.html,Advanced,Apache Airflow
+ETL,Video,ETL Pipelines Full Course,https://www.youtube.com/watch?v=IaWvUHrgG8E,Intermediate,freeCodeCamp
+ETL,Article,ETL vs ELT Explained,https://www.ibm.com/topics/elt,Intermediate,IBM

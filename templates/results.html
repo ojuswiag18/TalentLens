@@ -1,0 +1,2136 @@
+{% extends "base.html" %}
+{% block title %}Analysis Results — TalentLens{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="mt-3 mb-3 flex-between">
+    <a class="btn btn-ghost btn-sm" href="{{ url_for('analyze_page') }}">&larr; New Analysis</a>
+    <a class="btn btn-outline btn-sm" href="{{ url_for('dashboard_page', token=request.args.get('token')) }}">View Dashboard &rarr;</a>
+  </div>
+
+  {% if analysis.warning %}
+  <div class="alert alert-warning"><span class="icon">&#9888;&#65039;</span><span>{{ analysis.warning }}</span></div>
+  {% elif analysis.success %}
+  <div class="alert alert-success"><span class="icon">&#127881;</span><span>{{ analysis.success }}</span></div>
+  {% endif %}
+
+  <!-- Score hero -->
+  <section class="card fade-in-up" style="padding:2.5rem">
+    <div class="score-ring-wrap">
+      <div class="score-ring">
+        <svg viewBox="0 0 220 220">
+          <defs>
+            <linearGradient id="scoreGradient" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="var(--primary)"/>
+              <stop offset="100%" stop-color="var(--secondary)"/>
+            </linearGradient>
+          </defs>
+          <circle class="ring-track" cx="110" cy="110" r="100"></circle>
+          <circle class="ring-fill" cx="110" cy="110" r="100" data-value="{{ analysis.overall_score }}"></circle>
+        </svg>
+        <div class="score-number">
+          <div>
+            <div class="value"><span id="scoreValue">{{ analysis.overall_score }}</span>%</div>
+            <div class="label">TalentLens Compatibility Score</div>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="ats-explanation-trigger" aria-label="Explain score">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="15" y1="9" x2="9" y2="15"></line>
+        </svg>
+      </button>
+    </div>
+
+    <div class="score-breakdown">
+      <div class="breakdown-row">
+        <span class="label">Skills Match</span>
+        <span class="percentage">{{ analysis.skill_match }}%</span>
+      </div>
+      <div class="breakdown-row">
+        <span class="label">Keyword Match</span>
+        <span class="percentage">{{ analysis.keyword_match }}%</span>
+      </div>
+      <div class="breakdown-row">
+        <span class="label">Experience Match</span>
+        <span class="percentage">{{ analysis.breakdown.experience|default(0) }}%</span>
+      </div>
+      <div class="breakdown-row">
+        <span class="label">Project Relevance</span>
+        <span class="percentage">{{ analysis.breakdown.projects|default(0) }}%</span>
+      </div>
+      <div class="breakdown-row">
+        <span class="label">Education Match</span>
+        <span class="percentage">{{ analysis.breakdown.education|default(0) }}%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Skill Level Gaps -->
+  {% if analysis.level_gaps %}
+  <section class="mt-4">
+    <h2 class="mb-3" style="font-size:1.4rem">Skill Level Gaps</h2>
+    <div class="stack">
+      {% for gap in analysis.level_gaps %}
+      <div class="card">
+        <div class="flex-between">
+          <div>
+            <h3 style="font-size:1.1rem">{{ gap.name }}</h3>
+            <p class="muted" style="font-size:0.9rem">
+              Current Level: <strong>{{ gap.current_level|capitalize }}</strong>
+              <span class="chip chip-warning" style="margin:0 0.5rem">&rarr;</span>
+              Target Level: <strong>{{ gap.target_level|capitalize }}</strong>
+            </p>
+          </div>
+          <button type="button" class="btn btn-outline btn-sm" data-open-resource="{{ gap.name }}">Learn This Skill</button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- Skill Match Donut -->
+  <section class="mt-4">
+    <h2 class="mb-3" style="font-size:1.4rem">Skill Match</h2>
+    <div class="skill-match-summary">
+      <div class="skill-match-item">
+        <div class="number">{{ analysis.skill_match }}</div>
+        <div class="label">Matched Skills</div>
+      </div>
+      <div class="skill-match-item">
+        <div class="number" style="color:var(--danger)">{{ analysis.missing_skills_count }}</div>
+        <div class="label">Missing Skills</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Missing Skills -->
+  <section class="mt-4">
+    <h2 class="mb-3" style="font-size:1.4rem">Missing Skills</h2>
+    {% if analysis.missing_skills %}
+    <div class="stack">
+      {% for skill in analysis.missing_skills %}
+      <div class="missing-card severity-{{ skill.importance }}">
+        <div class="skill-info">
+          <h4>{{ skill.name }}</h4>
+          <p>
+            <span class="badge badge-{{ skill.importance }}">{{ skill.importance }}</span>
+            <span class="muted">{{ skill.category }}{% if skill.target_level %} &middot; target: {{ skill.target_level }}{% endif %}</span>
+          </p>
+        </div>
+        <div class="missing-card-actions">
+          <button type="button" class="btn btn-ghost btn-sm simulate-btn" data-skill="{{ skill.name }}">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+            Simulate
+          </button>
+          <button type="button" class="btn btn-outline btn-sm" data-open-resource="{{ skill.name }}">Learn This Skill</button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-success"><span class="icon">&#127881;</span><span>No major skill gaps were detected. Keep up the great work!</span></div>
+    {% endif %}
+  </section>
+
+  <!-- Compatibility Breakdown -->
+  <section class="mt-4">
+    <h2 class="mb-3" style="font-size:1.4rem">Compatibility Breakdown</h2>
+    <div class="compatibility-breakdown-list">
+      <div class="compatibility-breakdown-item">
+        <span class="compatibility-breakdown-name">Skills Match</span>
+        <div class="compatibility-breakdown-bar"><div class="compatibility-breakdown-bar-fill" style="width: {{ analysis.breakdown.skills }}%"></div></div>
+        <span class="compatibility-breakdown-name" style="font-weight:600; color:var(--primary)">{{ analysis.breakdown.skills }}%</span>
+      </div>
+      <div class="compatibility-breakdown-item">
+        <span class="compatibility-breakdown-name">Keyword Match</span>
+        <div class="compatibility-breakdown-bar"><div class="compatibility-breakdown-bar-fill" style="width: {{ analysis.breakdown.keywords }}%"></div></div>
+        <span class="compatibility-breakdown-name" style="font-weight:600; color:var(--secondary)">{{ analysis.breakdown.keywords }}%</span>
+      </div>
+      <div class="compatibility-breakdown-item">
+        <span class="compatibility-breakdown-name">Experience Match</span>
+        <div class="compatibility-breakdown-bar"><div class="compatibility-breakdown-bar-fill" style="width: {{ analysis.breakdown.experience|default(0) }}%"></div></div>
+        <span class="compatibility-breakdown-name" style="font-weight:600">{{ analysis.breakdown.experience|default(0) }}%</span>
+      </div>
+      <div class="compatibility-breakdown-item">
+        <span class="compatibility-breakdown-name">Project Relevance</span>
+        <div class="compatibility-breakdown-bar"><div class="compatibility-breakdown-bar-fill" style="width: {{ analysis.breakdown.projects|default(0) }}%"></div></div>
+        <span class="compatibility-breakdown-name" style="font-weight:600">{{ analysis.breakdown.projects|default(0) }}%</span>
+      </div>
+      <div class="compatibility-breakdown-item">
+        <span class="compatibility-breakdown-name">Education Match</span>
+        <div class="compatibility-breakdown-bar"><div class="compatibility-breakdown-bar-fill" style="width: {{ analysis.breakdown.education|default(0) }}%"></div></div>
+        <span class="compatibility-breakdown-name" style="font-weight:600">{{ analysis.breakdown.education|default(0) }}%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Keyword & Skill Analysis -->
+  <section class="mt-4">
+    <h2 class="mb-3" style="font-size:1.4rem">Keyword & Skill Analysis</h2>
+    <p style="color:var(--muted); margin-bottom:1rem; font-size:0.92rem">
+      Meaningful skills, technologies, and competencies identified from the job description.
+    </p>
+
+    <!-- Matched Skills -->
+    <div class="card" style="margin-bottom:1rem">
+      <h3 class="mb-2" style="font-size:1rem">
+        Matched Skills <span class="chip chip-success">{{ analysis.keywords.matched|length }}</span>
+      </h3>
+      {% if analysis.keywords.matched %}
+      <div class="keyword-list">
+        {% for kw in analysis.keywords.matched %}
+        <span class="chip chip-success">{{ kw }}</span>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="muted" style="font-size:0.9rem">No matching skills detected.</p>
+      {% endif %}
+    </div>
+
+    <!-- Missing Skills -->
+    <div class="card" style="margin-bottom:1rem">
+      <h3 class="mb-2" style="font-size:1rem">
+        Missing Skills <span class="chip chip-danger">{{ analysis.keywords.missing|length }}</span>
+      </h3>
+      {% if analysis.keywords.missing %}
+      <div class="keyword-list">
+        {% for kw in analysis.keywords.missing %}
+        <span class="chip chip-danger">{{ kw }}</span>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="muted" style="font-size:0.9rem">No missing skills detected — great match!</p>
+      {% endif %}
+    </div>
+
+    <!-- Skill Gap Priority -->
+    {% if analysis.skill_priority %}
+    <div class="card">
+      <h3 class="mb-2" style="font-size:1rem">Skill Gap Priority</h3>
+      <div class="priority-list">
+        {% set high_skills = analysis.skill_priority|selectattr('priority', 'equalto', 'high')|list %}
+        {% set med_skills = analysis.skill_priority|selectattr('priority', 'equalto', 'medium')|list %}
+        {% set low_skills = analysis.skill_priority|selectattr('priority', 'equalto', 'low')|list %}
+
+        {% if high_skills %}
+        <div class="priority-group">
+          <span class="priority-label high">High Priority</span>
+          {% for sp in high_skills %}
+          <div class="priority-item">
+            <span class="priority-skill">{{ sp.name }}</span>
+            <span class="priority-reason">{{ sp.reason }}</span>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if med_skills %}
+        <div class="priority-group">
+          <span class="priority-label medium">Medium Priority</span>
+          {% for sp in med_skills %}
+          <div class="priority-item">
+            <span class="priority-skill">{{ sp.name }}</span>
+            <span class="priority-reason">{{ sp.reason }}</span>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if low_skills %}
+        <div class="priority-group">
+          <span class="priority-label low">Low Priority</span>
+          {% for sp in low_skills %}
+          <div class="priority-item">
+            <span class="priority-skill">{{ sp.name }}</span>
+            <span class="priority-reason">{{ sp.reason }}</span>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </section>
+
+  <!-- Suggestions -->
+  <section class="mt-4">
+    <h2 class="mb-3" style="font-size:1.4rem">Improvement Suggestions</h2>
+    <div class="stack">
+      {% for suggestion in analysis.suggestions %}
+      <div class="suggestion-item">
+        <div class="num">{{ loop.index }}</div>
+        <div class="sugg-body">
+          <span class="badge badge-{{ suggestion.priority }}">{{ suggestion.priority }}</span>
+          <span class="chip chip-primary">{{ suggestion.category }}</span>
+          <p>{{ suggestion.text }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- ============ FEATURE 1: Job Description Insights ============ -->
+  {% if analysis.job_insights and analysis.job_insights.insights %}
+  <section class="mt-4">
+    <h2 class="mb-3" style="font-size:1.4rem">Job Description Insights</h2>
+    <p style="color:var(--muted); margin-bottom:1rem; font-size:0.92rem">
+      Observations about the job description structure and requirements.
+    </p>
+    <div class="insights-grid">
+      {% for item in analysis.job_insights.insights %}
+      <div class="insight-card">
+        <div class="insight-label">{{ item.label }}</div>
+        <div class="insight-value">
+          {% if item.value in ['Very High', 'High', 'Critical'] %}
+            <span class="insight-badge high">{{ item.value }}</span>
+          {% elif item.value in ['Moderate', 'Mid-Level', 'Junior+', 'Focused', 'Narrow'] %}
+            <span class="insight-badge moderate">{{ item.value }}</span>
+          {% elif item.value in ['Low', 'Entry-Level'] %}
+            <span class="insight-badge low">{{ item.value }}</span>
+          {% else %}
+            <span class="insight-badge neutral">{{ item.value }}</span>
+          {% endif %}
+        </div>
+        <div class="insight-desc">{{ item.desc }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- ============ FEATURE 2: Hidden Strengths ============ -->
+  {% if analysis.hidden_strengths %}
+  <section class="mt-4">
+    <h2 class="mb-3" style="font-size:1.4rem">Hidden Strengths</h2>
+    <p style="color:var(--muted); margin-bottom:1rem; font-size:0.92rem">
+      Skills or experience you demonstrate but could emphasize more strongly.
+    </p>
+    <div class="stack">
+      {% for item in analysis.hidden_strengths %}
+      <div class="hidden-strength-card">
+        <div class="hs-header">
+          <span class="hs-skill">{{ item.skill }}</span>
+          <span class="chip chip-primary" style="font-size:0.7rem">{{ item.category }}</span>
+        </div>
+        {% if item.evidence %}
+        <div class="hs-evidence">
+          <span class="hs-evidence-label">Evidence:</span>
+          <em>"{{ item.evidence }}"</em>
+        </div>
+        {% endif %}
+        <div class="hs-recommendation">{{ item.recommendation }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- ============ FEATURE 3: Career Story Consistency ============ -->
+  {% if analysis.career_consistency %}
+  {% set cc = analysis.career_consistency %}
+  <section class="mt-4">
+    <h2 class="mb-3" style="font-size:1.4rem">Career Story Consistency</h2>
+    <p style="color:var(--muted); margin-bottom:1rem; font-size:0.92rem">
+      How consistently your resume supports the target role.
+    </p>
+    <div class="card" style="padding:1.5rem">
+      <div class="cc-score-wrap">
+        <div class="cc-score-ring">
+          <svg viewBox="0 0 120 120">
+            <circle class="cc-ring-track" cx="60" cy="60" r="50"></circle>
+            <circle class="cc-ring-fill" cx="60" cy="60" r="50"
+              data-value="{{ cc.score }}"
+              style="stroke-dasharray: 314; stroke-dashoffset: {{ 314 - (cc.score / 100 * 314) }};"></circle>
+          </svg>
+          <div class="cc-score-num"><span>{{ cc.score }}</span>%</div>
+        </div>
+        <div class="cc-explanation">{{ cc.explanation }}</div>
+      </div>
+      {% if cc.strengths %}
+      <div class="cc-section">
+        <h4 class="cc-section-title cc-strong">Strong Alignment</h4>
+        {% for s in cc.strengths %}
+        <div class="cc-item">{{ s }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% if cc.gaps %}
+      <div class="cc-section">
+        <h4 class="cc-section-title cc-gap">Potential Gap</h4>
+        {% for g in cc.gaps %}
+        <div class="cc-item">{{ g }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- ============ FEATURE 4: What Could Improve My Score? ============ -->
+  <section class="mt-4" id="improveScoreSection">
+    <h2 class="mb-3" style="font-size:1.4rem">What Could Improve My Score?</h2>
+    <p style="color:var(--muted); margin-bottom:1rem; font-size:0.92rem">
+      Select improvements to see their estimated impact on your compatibility score.
+    </p>
+    <div class="card" style="padding:1.5rem">
+      <div class="improve-options" id="improveOptions">
+        {% for skill in analysis.missing_skills %}
+        <label class="improve-option">
+          <input type="checkbox" value="{{ skill.name }}" class="improve-cb"
+            data-importance="{{ skill.importance }}">
+          <span class="improve-cb-custom"></span>
+          <span class="improve-option-text">
+            <span>Add stronger <strong>{{ skill.name }}</strong> evidence</span>
+            <span class="badge badge-{{ skill.importance }}" style="margin-left:0.35rem">{{ skill.importance }}</span>
+          </span>
+        </label>
+        {% endfor %}
+        {% if analysis.breakdown.keywords < 60 %}
+        <label class="improve-option">
+          <input type="checkbox" value="__keywords__" class="improve-cb" data-importance="important">
+          <span class="improve-cb-custom"></span>
+          <span class="improve-option-text">Improve keyword alignment</span>
+        </label>
+        {% endif %}
+        {% if analysis.breakdown.projects < 60 %}
+        <label class="improve-option">
+          <input type="checkbox" value="__projects__" class="improve-cb" data-importance="important">
+          <span class="improve-cb-custom"></span>
+          <span class="improve-option-text">Add relevant project experience</span>
+        </label>
+        {% endif %}
+        {% if analysis.breakdown.experience < 60 %}
+        <label class="improve-option">
+          <input type="checkbox" value="__experience__" class="improve-cb" data-importance="important">
+          <span class="improve-cb-custom"></span>
+          <span class="improve-option-text">Strengthen experience section</span>
+        </label>
+        {% endif %}
+      </div>
+      <button type="button" class="btn btn-primary btn-sm mt-3" id="runSimulation" disabled>Estimate Impact</button>
+      <div id="simResult" class="sim-result-wrap" style="display:none">
+        <!-- Filled by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FEATURE 5: Skill Dependency Map ============ -->
+  {% if analysis.dependency_map and analysis.dependency_map.nodes %}
+  <section class="mt-4">
+    <h2 class="mb-3" style="font-size:1.4rem">Skill Dependency Map</h2>
+    <p style="color:var(--muted); margin-bottom:1rem; font-size:0.92rem">
+      How the required skills relate to and build upon each other. Click any skill to see details.
+    </p>
+
+    <!-- Skill Summary Counts -->
+    <div class="dep-summary" id="depSummary"></div>
+
+    <!-- Filters -->
+    <div class="dep-filters" id="depFilters">
+      <button type="button" class="dep-filter-btn active" data-filter="all">All Skills</button>
+      <button type="button" class="dep-filter-btn" data-filter="matched">My Skills</button>
+      <button type="button" class="dep-filter-btn" data-filter="missing">Skill Gaps</button>
+    </div>
+
+    <!-- SVG Map -->
+    <div class="card" style="padding:1.5rem; overflow-x:auto">
+      <div class="dep-map" id="depMap">
+        <svg id="depMapSvg"></svg>
+      </div>
+      <div class="dep-legend">
+        <span class="dep-legend-item"><span class="dep-dot matched"></span> Already Have</span>
+        <span class="dep-legend-item"><span class="dep-dot missing"></span> Skill Gap</span>
+        <span class="dep-legend-item"><span class="dep-dot recommended"></span> Recommended Next</span>
+        <span class="dep-legend-item"><span class="dep-dot supporting"></span> Supporting</span>
+      </div>
+    </div>
+
+    <!-- Detail Panel (hidden by default) -->
+    <div class="dep-detail-panel" id="depDetailPanel">
+      <div class="dep-detail-inner">
+        <div class="dep-detail-head">
+          <h3 id="depDetailSkill"></h3>
+          <button type="button" class="dep-detail-close" id="depDetailClose" aria-label="Close">&times;</button>
+        </div>
+        <div class="dep-detail-body" id="depDetailBody"></div>
+      </div>
+    </div>
+
+    <!-- Recommended Starting Point -->
+    {% if analysis.dependency_map.recommended %}
+    <div class="dep-recommended" id="depRecommended">
+      <div class="dep-rec-icon">&#127919;</div>
+      <div class="dep-rec-content">
+        <h4>Recommended Starting Point</h4>
+        <div class="dep-rec-skill">{{ analysis.dependency_map.recommended.skill }}</div>
+        <p class="dep-rec-reason">{{ analysis.dependency_map.recommended.reason }}</p>
+        <button type="button" class="btn btn-primary btn-sm" data-open-resource="{{ analysis.dependency_map.recommended.skill }}">Learn This Skill</button>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Dependency Learning Path -->
+    {% if analysis.dependency_map.learning_path %}
+    <div class="dep-learning-path">
+      <h3 style="font-size:1.1rem; margin-bottom:0.75rem;">Your Learning Path</h3>
+      <div class="dep-lp-grid" id="depLearningPath">
+        {% for step in analysis.dependency_map.learning_path %}
+        <div class="dep-lp-chip{% if loop.index > 6 %} dep-lp-overflow{% endif %}" data-skill="{{ step.skill }}" data-status="{{ step.status }}">
+          <span class="dep-lp-num">{{ '%02d' % loop.index }}</span>
+          <span class="dep-lp-skill">{{ step.skill }}</span>
+          {% if step.status == 'already_have' %}
+          <span class="dep-lp-badge already-have">&#10003;</span>
+          {% else %}
+          <span class="dep-lp-badge skill-gap">&#128308;</span>
+          {% endif %}
+        </div>
+        {% if not loop.last and loop.index < analysis.dependency_map.learning_path|length %}<span class="dep-lp-arrow">&rarr;</span>{% endif %}
+        {% endfor %}
+      </div>
+      {% if analysis.dependency_map.learning_path|length > 6 %}
+      <button type="button" class="dep-lp-toggle" id="depLpToggle">Show Full Learning Path</button>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <script id="depMapData" type="application/json">{{ analysis.dependency_map | tojson }}</script>
+  </section>
+  {% endif %}
+
+  <!-- ============ FEATURE 6: Personalized Learning Path ============ -->
+  {% if analysis.learning_path %}
+  <section class="mt-4">
+    <h2 class="mb-3" style="font-size:1.4rem">Your Learning Path</h2>
+    <p style="color:var(--muted); margin-bottom:1rem; font-size:0.92rem">
+      A prioritized sequence based on your skill gaps and the target role.
+    </p>
+    <div class="learning-path" id="learningPath">
+      {% for step in analysis.learning_path %}
+      <div class="lp-step" data-step="{{ step.step }}" data-skill="{{ step.skill }}">
+        <div class="lp-num">
+          <span class="lp-num-inner">{{ '%02d' % step.step }}</span>
+        </div>
+        <div class="lp-content">
+          <div class="lp-skill">{{ step.skill }}</div>
+          <div class="lp-reason">{{ step.reason }}</div>
+          <div class="lp-actions">
+            <button type="button" class="lp-status-btn" data-status="Not Started">Not Started</button>
+            <button type="button" class="lp-status-btn" data-status="Learning">Learning</button>
+            <button type="button" class="lp-status-btn" data-status="Completed">Completed</button>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- ============ FEATURE 7: Resume Version Comparison ============ -->
+  <section class="mt-4">
+    <h2 class="mb-3" style="font-size:1.4rem">Compare Resume Versions</h2>
+    <p style="color:var(--muted); margin-bottom:1rem; font-size:0.92rem">
+      Upload an updated resume to see how your compatibility has improved.
+    </p>
+    <div class="card" style="padding:1.5rem">
+      <div id="versionCompareArea">
+        <div class="version-cta" id="versionCTA">
+          <p>Upload a newer version of your resume to compare against the current analysis.</p>
+          <div class="version-upload-row">
+            <input type="file" id="newResumeFile" accept=".pdf,.txt" style="display:none">
+            <button type="button" class="btn btn-outline btn-sm" id="uploadNewVersion">Upload Updated Resume</button>
+          </div>
+          <input type="hidden" id="oldToken" value="{{ request.args.get('token', '') }}">
+        </div>
+        <div id="versionResult" style="display:none"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FEATURE 8: Role Comparison ============ -->
+  <section class="mt-4">
+    <h2 class="mb-3" style="font-size:1.4rem">Compare Your Fit Across Roles</h2>
+    <p style="color:var(--muted); margin-bottom:1rem; font-size:0.92rem">
+      Compare your resume against multiple job descriptions to find your best fit.
+    </p>
+    <div class="card" style="padding:1.5rem">
+      <div id="roleCompareArea">
+        <!-- Add role form -->
+        <div class="role-add-form" id="roleAddForm">
+          <textarea id="addRoleJD" placeholder="Paste a job description for a different role..." style="min-height:80px; width:100%; margin-bottom:0.5rem"></textarea>
+          <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap">
+            <input type="text" id="addRoleName" placeholder="Role name (e.g., Data Analyst)" style="flex:1; min-width:150px; margin-bottom:0">
+            <button type="button" class="btn btn-outline btn-sm" id="addRoleBtn">Add Role & Analyze</button>
+          </div>
+        </div>
+
+        <!-- Empty state -->
+        <div id="roleEmpty" class="role-empty">
+          <p style="margin:0">No roles added for comparison yet.</p>
+          <p style="margin:0.25rem 0 0; font-size:0.85rem; color:var(--muted)">Add different job descriptions to see which roles best match your resume.</p>
+        </div>
+
+        <!-- Comparison results -->
+        <div id="roleResults" style="display:none"></div>
+
+        <!-- Hidden: token store -->
+        <div id="roleTokens" data-current="{{ request.args.get('token', '') }}" style="display:none"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Resume Builder CTA -->
+  <section class="mt-4">
+    <div class="card" style="padding:2rem; text-align:center; background:linear-gradient(135deg, rgba(37,99,235,0.05), rgba(124,58,237,0.05))">
+      <h3 style="margin-bottom:0.5rem">Ready to Improve Your Resume?</h3>
+      <p style="color:var(--muted); margin-bottom:1rem; max-width:500px; margin-left:auto; margin-right:auto">
+        Turn your analysis into a stronger, job-targeted resume with live preview and ATS recalculation.
+      </p>
+      <a href="{{ url_for('resume_builder_page', token=request.args.get('token', '')) }}" class="btn btn-primary">
+        Build My Improved Resume →
+      </a>
+    </div>
+  </section>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<script>
+(function () {
+  "use strict";
+
+  function escapeHtml(str) {
+    var div = document.createElement("div");
+    div.textContent = String(str == null ? "" : str);
+    return div.innerHTML;
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    /* ---- ATE explanation modal ---- */
+    var trigger = document.querySelector(".ats-explanation-trigger");
+    var modal = document.querySelector(".ats-explanation-modal");
+    var closeBtn = modal ? modal.querySelector(".ats-explanation-close") : null;
+
+    if (trigger) {
+      trigger.addEventListener("click", function (e) {
+        e.preventDefault();
+        if (modal) modal.classList.add("active");
+        document.body.style.overflow = "hidden";
+      });
+    }
+    if (closeBtn) {
+      closeBtn.addEventListener("click", function () {
+        if (modal) modal.classList.remove("active");
+        document.body.style.overflow = "";
+      });
+    }
+    if (modal) {
+      modal.addEventListener("click", function (e) {
+        if (e.target === modal) {
+          modal.classList.remove("active");
+          document.body.style.overflow = "";
+        }
+      });
+    }
+
+    /* ---- Score ring animation ---- */
+    var scoreValue = document.getElementById("scoreValue");
+    var ringFill = document.querySelector(".ring-fill");
+    if (scoreValue && ringFill) {
+      var target = parseInt(scoreValue.textContent, 10);
+      var circumference = 628;
+      var offset = circumference - (target / 100) * circumference;
+      ringFill.style.strokeDashoffset = offset;
+
+      var startTime = null;
+      function tick(ts) {
+        if (!startTime) startTime = ts;
+        var progress = Math.min((ts - startTime) / 1600, 1);
+        var eased = 1 - Math.pow(1 - progress, 3);
+        scoreValue.textContent = Math.round(target * eased);
+        if (progress < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }
+
+    /* ---- Simulation modal ---- */
+    var simModal = document.getElementById("simModal");
+    var simBody = document.getElementById("simModalBody");
+    var simClose = document.getElementById("simModalClose");
+
+    function openSimModal() {
+      if (simModal) {
+        simModal.classList.add("active");
+        document.body.style.overflow = "hidden";
+      }
+    }
+    function closeSimModal() {
+      if (simModal) {
+        simModal.classList.remove("active");
+        document.body.style.overflow = "";
+      }
+    }
+
+    if (simClose) simClose.addEventListener("click", closeSimModal);
+    if (simModal) {
+      simModal.addEventListener("click", function (e) {
+        if (e.target === simModal) closeSimModal();
+      });
+    }
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && simModal && simModal.classList.contains("active")) {
+        closeSimModal();
+      }
+    });
+
+    /* ---- Simulate button clicks ---- */
+    var token = new URLSearchParams(window.location.search).get("token") || "";
+    document.querySelectorAll(".simulate-btn").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var skillName = this.getAttribute("data-skill");
+        if (!skillName || !token) return;
+
+        /* Show loading state */
+        simBody.innerHTML =
+          '<div class="sim-loading">' +
+          '<div class="spinner"></div>' +
+          '<p>Calculating estimated improvement\u2026</p>' +
+          '</div>';
+        openSimModal();
+
+        fetch("/api/simulate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token: token, skill_name: skillName })
+        })
+        .then(function (res) { return res.json().then(function (j) { return { ok: res.ok, body: j }; }); })
+        .then(function (result) {
+          if (!result.ok) throw new Error(result.body.error || "Simulation failed.");
+          renderSimResult(result.body);
+        })
+        .catch(function (err) {
+          simBody.innerHTML =
+            '<div class="alert alert-danger">' + escapeHtml(err.message) + '</div>';
+        });
+      });
+    });
+
+    function renderSimResult(data) {
+      var deltaText = data.delta > 0 ? "+" + data.delta + "%" : data.delta === 0 ? "No change" : data.delta + "%";
+      var deltaClass = data.delta > 0 ? "positive" : "neutral";
+
+      var breakdownRows = "";
+      var labels = { skills: "Skills Match", keywords: "Keyword Match", experience: "Experience", education: "Education", projects: "Projects" };
+      Object.keys(labels).forEach(function (key) {
+        var cur = data.current_breakdown[key] || 0;
+        var sim = data.simulated_breakdown[key] || 0;
+        var changed = cur !== sim;
+        breakdownRows +=
+          '<div class="sim-breakdown-row">' +
+          '<span class="label">' + labels[key] + '</span>' +
+          '<span class="values">' +
+          '<span>' + cur + '%</span>' +
+          (changed ? '<span class="arrow">\u2192</span><span class="new-val">' + sim + '%</span>' : '') +
+          '</span></div>';
+      });
+
+      simBody.innerHTML =
+        '<div class="sim-badge">\u26A1 Simulation &mdash; Estimated Improvement</div>' +
+        '<div class="sim-result-skill">Skill: <span>' + escapeHtml(data.skill_name) + '</span></div>' +
+        '<div class="sim-scores">' +
+        '<div class="sim-score-card">' +
+        '<div class="sim-score-label">Current</div>' +
+        '<div class="sim-score-value">' + data.current_score + '%</div>' +
+        '</div>' +
+        '<div class="sim-score-card projected">' +
+        '<div class="sim-score-label">Simulated</div>' +
+        '<div class="sim-score-value">' + data.simulated_score + '%</div>' +
+        '<div class="sim-delta ' + deltaClass + '">' + deltaText + '</div>' +
+        '</div>' +
+        '</div>' +
+        '<div class="sim-explanation"><p>' + escapeHtml(data.explanation) + '</p></div>' +
+        '<div class="sim-breakdown"><h4>Score Breakdown Comparison</h4>' + breakdownRows + '</div>' +
+        '<div class="sim-footer-note">This is an estimated simulation, not a guaranteed outcome. Actual results depend on how you demonstrate the skill on your resume.</div>';
+    }
+
+    /* ---- Feature 4: What Could Improve My Score ---- */
+    var improveCbs = document.querySelectorAll(".improve-cb");
+    var runSimBtn = document.getElementById("runSimulation");
+    var simResultWrap = document.getElementById("simResult");
+
+    improveCbs.forEach(function (cb) {
+      cb.addEventListener("change", function () {
+        var anyChecked = document.querySelectorAll(".improve-cb:checked").length > 0;
+        if (runSimBtn) runSimBtn.disabled = !anyChecked;
+      });
+    });
+
+    if (runSimBtn) {
+      runSimBtn.addEventListener("click", function () {
+        var checked = document.querySelectorAll(".improve-cb:checked");
+        var names = [];
+        checked.forEach(function (cb) {
+          var v = cb.value;
+          if (v && !v.startsWith("__")) names.push(v);
+        });
+        if (names.length === 0) return;
+
+        simResultWrap.style.display = "block";
+        simResultWrap.innerHTML = '<div class="sim-loading"><div class="spinner"></div><p>Calculating estimated impact\u2026</p></div>';
+
+        fetch("/api/simulate-multi", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token: token, skill_names: names })
+        })
+        .then(function (res) { return res.json().then(function (j) { return { ok: res.ok, body: j }; }); })
+        .then(function (result) {
+          if (!result.ok) throw new Error(result.body.error || "Simulation failed.");
+          renderMultiSimResult(result.body);
+        })
+        .catch(function (err) {
+          simResultWrap.innerHTML = '<div class="alert alert-danger">' + escapeHtml(err.message) + '</div>';
+        });
+      });
+    }
+
+    function renderMultiSimResult(data) {
+      var deltaText = data.delta > 0 ? "+" + data.delta + "%" : data.delta === 0 ? "No change" : data.delta + "%";
+      var deltaClass = data.delta > 0 ? "positive" : "neutral";
+
+      var contribHtml = "";
+      if (data.contributions && data.contributions.length) {
+        contribHtml = '<div class="sim-contributions"><h4>Top Contributors</h4>';
+        data.contributions.slice(0, 5).forEach(function (c) {
+          contribHtml += '<div class="sim-contrib-row">'
+            + '<span class="sim-contrib-skill">' + escapeHtml(c.skill) + '</span>'
+            + '<span class="sim-contrib-badge badge-' + c.importance + '">' + c.importance + '</span>'
+            + '<span class="sim-contrib-delta">+' + c.contribution + '%</span>'
+            + '</div>';
+        });
+        contribHtml += '</div>';
+      }
+
+      simResultWrap.innerHTML =
+        '<div class="sim-badge">\u26A1 Simulation &mdash; Estimated Impact</div>'
+        + '<div class="sim-scores">'
+        + '<div class="sim-score-card"><div class="sim-score-label">Current</div>'
+        + '<div class="sim-score-value">' + data.current_score + '%</div></div>'
+        + '<div class="sim-score-card projected"><div class="sim-score-label">Estimated</div>'
+        + '<div class="sim-score-value">' + data.simulated_score + '%</div>'
+        + '<div class="sim-delta ' + deltaClass + '">' + deltaText + '</div></div>'
+        + '</div>'
+        + contribHtml
+        + '<div class="sim-footer-note">This is an estimated simulation, not a guaranteed outcome.</div>';
+    }
+
+    /* ---- Feature 5: Skill Dependency Map (SVG Interactive) ---- */
+    var depMapEl = document.getElementById("depMapData");
+    if (depMapEl) {
+      try {
+        var depData = JSON.parse(depMapEl.textContent);
+        renderDepMapSummary(depData);
+        drawDependencyMapSVG(depData);
+      } catch (e) {}
+    }
+
+    function renderDepMapSummary(data) {
+      var el = document.getElementById("depSummary");
+      if (!el) return;
+      var nodes = data.nodes || [];
+      var required = nodes.length;
+      var have = nodes.filter(function (n) { return n.status === "matched"; }).length;
+      var gaps = nodes.filter(function (n) { return n.status === "missing"; }).length;
+      el.innerHTML = '<span class="dep-count">Skills Required: <strong>' + required + '</strong></span>'
+        + '<span class="dep-count have">\u2713 Already Have: <strong>' + have + '</strong></span>'
+        + '<span class="dep-count gap">\u{1F534} Skill Gaps: <strong>' + gaps + '</strong></span>';
+    }
+
+    var currentDepFilter = "all";
+    var depFilterBtns = document.querySelectorAll(".dep-filter-btn");
+    depFilterBtns.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        depFilterBtns.forEach(function (b) { b.classList.remove("active"); });
+        this.classList.add("active");
+        currentDepFilter = this.getAttribute("data-filter");
+        if (depMapEl) {
+          try {
+            var d = JSON.parse(depMapEl.textContent);
+            drawDependencyMapSVG(d);
+          } catch (e) {}
+        }
+      });
+    });
+
+    function drawDependencyMapSVG(data) {
+      var svg = document.getElementById("depMapSvg");
+      if (!svg) return;
+      var container = svg.parentElement;
+      var W = container.clientWidth;
+      var allNodes = data.nodes || [];
+      var allEdges = data.edges || [];
+      if (!allNodes.length) { svg.innerHTML = ""; return; }
+
+      // Filter nodes
+      var nodes = allNodes;
+      if (currentDepFilter === "matched") nodes = allNodes.filter(function (n) { return n.status === "matched"; });
+      else if (currentDepFilter === "missing") nodes = allNodes.filter(function (n) { return n.status === "missing"; });
+      var nodeIds = {}; nodes.forEach(function (n) { nodeIds[n.id] = true; });
+      var edges = allEdges.filter(function (e) { return nodeIds[e.source] && nodeIds[e.target]; });
+
+      // Group by layer
+      var layers = [[], [], [], []];
+      nodes.forEach(function (n) { var l = n.layer || 0; if (l >= 0 && l <= 3) layers[l].push(n); else layers[0].push(n); });
+      var usedLayers = layers.filter(function (l) { return l.length > 0; });
+      var numLayers = usedLayers.length;
+      if (numLayers === 0) { svg.innerHTML = ""; return; }
+
+      var rowH = 90;
+      var svgH = numLayers * rowH + 40;
+      var nodeR = 30;
+      var svgContent = "";
+      var positions = {};
+
+      // Layer labels
+      var layerNames = data.layer_names || {0:"Foundation",1:"Core",2:"Advanced",3:"Specialized"};
+
+      usedLayers.forEach(function (layer, li) {
+        var y = li * rowH + rowH / 2 + 20;
+        var spacing = W / (layer.length + 1);
+        svgContent += '<text x="8" y="' + y + '" class="dep-layer-label" dominant-baseline="middle">' + (layerNames[li] || "") + '</text>';
+        layer.forEach(function (n, ni) {
+          var x = spacing * (ni + 1);
+          positions[n.id] = {x: x, y: y};
+          var cls = "dep-node dep-node-" + n.status;
+          if (n.status === "missing" && n.importance === "critical") cls += " dep-critical";
+          svgContent += '<g class="' + cls + '" data-skill="' + escapeHtml(n.id) + '" style="cursor:pointer">';
+          svgContent += '<circle cx="' + x + '" cy="' + y + '" r="' + nodeR + '" class="dep-circle"/>';
+          var label = n.id.length > 14 ? n.id.substring(0, 13) + "\u2026" : n.id;
+          svgContent += '<text x="' + x + '" y="' + y + '" class="dep-label" dominant-baseline="middle" text-anchor="middle">' + escapeHtml(label) + '</text>';
+          svgContent += '</g>';
+        });
+      });
+
+      // Draw edges (only between visible nodes)
+      var defsContent = '<defs><marker id="depArrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" class="dep-arrow-path"/></marker></defs>';
+      var edgeContent = "";
+      edges.forEach(function (e) {
+        var from = positions[e.source];
+        var to = positions[e.target];
+        if (!from || !to) return;
+        var dx = to.x - from.x;
+        var dy = to.y - from.y;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist === 0) return;
+        var ux = dx / dist;
+        var uy = dy / dist;
+        var x1 = from.x + ux * (nodeR + 2);
+        var y1 = from.y + uy * (nodeR + 2);
+        var x2 = to.x - ux * (nodeR + 6);
+        var y2 = to.y - uy * (nodeR + 6);
+        edgeContent += '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" class="dep-edge" marker-end="url(#depArrow)"/>';
+      });
+
+      svg.setAttribute("viewBox", "0 0 " + W + " " + svgH);
+      svg.setAttribute("width", W);
+      svg.setAttribute("height", svgH);
+      svg.innerHTML = defsContent + edgeContent + svgContent;
+
+      // Click handlers for skill nodes
+      svg.querySelectorAll(".dep-node").forEach(function (g) {
+        g.addEventListener("click", function () {
+          var skill = this.getAttribute("data-skill");
+          var node = allNodes.find(function (n) { return n.id === skill; });
+          if (node) showDepDetail(node);
+        });
+      });
+    }
+
+    function showDepDetail(node) {
+      var panel = document.getElementById("depDetailPanel");
+      var title = document.getElementById("depDetailSkill");
+      var body = document.getElementById("depDetailBody");
+      if (!panel || !title || !body) return;
+      title.textContent = node.id;
+      var statusMap = {matched: "\u{1F7E2} Already Have", missing: "\u{1F534} Skill Gap", supporting: "\u26AA Supporting"};
+      var statusClass = "dep-status-" + node.status;
+      var html = '<div class="dep-detail-row"><span class="dep-detail-label">Status</span><span class="dep-detail-val ' + statusClass + '">' + (statusMap[node.status] || node.status) + '</span></div>';
+      if (node.importance) html += '<div class="dep-detail-row"><span class="dep-detail-label">Priority</span><span class="dep-detail-val">' + node.importance.charAt(0).toUpperCase() + node.importance.slice(1) + '</span></div>';
+      if (node.prerequisites && node.prerequisites.length) html += '<div class="dep-detail-row"><span class="dep-detail-label">Prerequisites</span><span class="dep-detail-val">' + node.prerequisites.join(', ') + '</span></div>';
+      if (node.leads_to && node.leads_to.length) html += '<div class="dep-detail-row"><span class="dep-detail-label">Leads To</span><span class="dep-detail-val">' + node.leads_to.join(', ') + '</span></div>';
+      if (node.why_it_matters) html += '<div class="dep-detail-row"><span class="dep-detail-label">Why It Matters</span><span class="dep-detail-val">' + escapeHtml(node.why_it_matters) + '</span></div>';
+      if (node.status === "missing") html += '<div class="dep-detail-actions"><button type="button" class="btn btn-primary btn-sm" data-open-resource="' + escapeHtml(node.id) + '">Learn This Skill</button></div>';
+      body.innerHTML = html;
+      panel.classList.add("active");
+      document.body.style.overflow = "hidden";
+    }
+
+    var depDetailClose = document.getElementById("depDetailClose");
+    if (depDetailClose) {
+      depDetailClose.addEventListener("click", function () {
+        var panel = document.getElementById("depDetailPanel");
+        if (panel) { panel.classList.remove("active"); document.body.style.overflow = ""; }
+      });
+    }
+    var depDetailPanel = document.getElementById("depDetailPanel");
+    if (depDetailPanel) {
+      depDetailPanel.addEventListener("click", function (e) {
+        if (e.target === depDetailPanel) { depDetailPanel.classList.remove("active"); document.body.style.overflow = ""; }
+      });
+    }
+
+    /* ---- Learning Path toggle ---- */
+    var lpToggle = document.getElementById("depLpToggle");
+    var lpExpanded = false;
+    if (lpToggle) {
+      lpToggle.addEventListener("click", function () {
+        lpExpanded = !lpExpanded;
+        var overflow = document.querySelectorAll(".dep-lp-overflow");
+        overflow.forEach(function (el) {
+          if (lpExpanded) el.classList.add("show");
+          else el.classList.remove("show");
+        });
+        lpToggle.textContent = lpExpanded ? "Show Less" : "Show Full Learning Path";
+      });
+    }
+
+    /* ---- Feature 6: Learning Path (localStorage) ---- */
+    var lpSteps = document.querySelectorAll(".lp-step");
+    var lpKey = "tl-learning-path-" + token;
+    var lpState = {};
+    try { lpState = JSON.parse(localStorage.getItem(lpKey) || "{}"); } catch (e) {}
+
+    lpSteps.forEach(function (step) {
+      var skill = step.getAttribute("data-skill");
+      var btns = step.querySelectorAll(".lp-status-btn");
+      if (lpState[skill]) {
+        btns.forEach(function (b) {
+          if (b.getAttribute("data-status") === lpState[skill]) {
+            b.classList.add("active");
+            step.classList.add("lp-" + lpState[skill].toLowerCase().replace(/\s+/g, "-"));
+          }
+        });
+      }
+      btns.forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var status = this.getAttribute("data-status");
+          lpState[skill] = status;
+          localStorage.setItem(lpKey, JSON.stringify(lpState));
+          btns.forEach(function (b) { b.classList.remove("active"); });
+          this.classList.add("active");
+          step.className = "lp-step";
+          step.classList.add("lp-" + status.toLowerCase().replace(/\s+/g, "-"));
+        });
+      });
+    });
+
+    /* ---- Feature 7: Resume Version Comparison ---- */
+    var uploadBtn = document.getElementById("uploadNewVersion");
+    var newResumeInput = document.getElementById("newResumeFile");
+    var oldTokenInput = document.getElementById("oldToken");
+    var versionResult = document.getElementById("versionResult");
+
+    if (uploadBtn && newResumeInput) {
+      uploadBtn.addEventListener("click", function () { newResumeInput.click(); });
+      newResumeInput.addEventListener("change", function () {
+        if (!this.files.length) return;
+        var fd = new FormData();
+        fd.append("resume", this.files[0]);
+        fd.append("job_description", ""); // Will be filled server-side from old analysis
+
+        versionResult.style.display = "block";
+        versionResult.innerHTML = '<div class="sim-loading"><div class="spinner"></div><p>Analyzing new resume\u2026</p></div>';
+
+        // First, get the old analysis to extract job description
+        fetch("/api/analysis?token=" + encodeURIComponent(oldTokenInput.value))
+          .then(function (r) { return r.json(); })
+          .then(function (oldData) {
+            // Re-analyze with the new resume and the EXACT original job description
+            var fd2 = new FormData();
+            fd2.append("resume", newResumeInput.files[0]);
+            fd2.append("job_description", oldData.job_text || "");
+            return fetch("/api/analyze", {
+              method: "POST",
+              body: fd2
+            });
+          })
+          .then(function (r) { return r.json(); })
+          .then(function (newData) {
+            if (newData.error) throw new Error(newData.error);
+            return fetch("/api/compare-resume", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ old_token: oldTokenInput.value, new_token: newData.token })
+            });
+          })
+          .then(function (r) { return r.json(); })
+          .then(function (comp) {
+            if (comp.error) throw new Error(comp.error);
+            renderVersionComparison(comp);
+          })
+          .catch(function (err) {
+            versionResult.innerHTML = '<div class="alert alert-danger">' + escapeHtml(err.message) + '</div>';
+          });
+      });
+    }
+
+    function renderVersionComparison(data) {
+      var improved = data.new_score > data.old_score;
+      versionResult.innerHTML =
+        '<div class="sim-badge">\u2194️ Resume Version Comparison</div>'
+        + '<div class="version-compare-grid">'
+        + '<div class="version-col"><div class="version-col-label">Previous</div>'
+        + '<div class="version-col-score">' + data.old_score + '%</div>'
+        + '<div class="version-col-detail">' + data.old_matched + ' matched &middot; ' + data.old_missing + ' missing</div></div>'
+        + '<div class="version-col-arrow">\u2192</div>'
+        + '<div class="version-col"><div class="version-col-label">New</div>'
+        + '<div class="version-col-score" style="color:var(--' + (improved ? 'success' : 'warning') + ')">' + data.new_score + '%</div>'
+        + '<div class="version-col-detail">' + data.new_matched + ' matched &middot; ' + data.new_missing + ' missing</div></div>'
+        + '</div>'
+        + '<div class="version-details">'
+        + (data.skills_added.length ? '<div class="version-row"><span class="version-row-label">Skills Added</span><span class="version-row-val success">' + data.skills_added.join(", ") + '</span></div>' : '')
+        + (data.skills_removed.length ? '<div class="version-row"><span class="version-row-label">Skills Removed</span><span class="version-row-val danger">' + data.skills_removed.join(", ") + '</span></div>' : '')
+        + '<div class="version-row"><span class="version-row-label">Keyword Alignment</span><span class="version-row-val">' + data.old_keyword_match + '% \u2192 ' + data.new_keyword_match + '%</span></div>'
+        + (data.remaining_gaps.length ? '<div class="version-row"><span class="version-row-label">Remaining Gaps</span><span class="version-row-val muted">' + data.remaining_gaps.join(", ") + '</span></div>' : '')
+        + '</div>';
+    }
+
+    /* ---- Feature 8: Role Comparison ---- */
+    var addRoleBtn = document.getElementById("addRoleBtn");
+    var roleResultsEl = document.getElementById("roleResults");
+    var roleEmptyEl = document.getElementById("roleEmpty");
+    var roleCompareRoles = [];
+    var storageKey = 'talentlens-role-compare-' + token;
+
+    function renderRoleComparison() {
+      if (!roleCompareRoles.length) {
+        roleResultsEl.style.display = 'none';
+        roleEmptyEl.style.display = 'block';
+        return;
+      }
+      roleEmptyEl.style.display = 'none';
+      roleResultsEl.style.display = 'block';
+
+      var sorted = roleCompareRoles.slice().sort(function(a, b) { return b.overall_score - a.overall_score; });
+      var best = sorted[0];
+      var html = '';
+
+      /* bar chart */
+      html += '<div class="role-chart">';
+      sorted.forEach(function(r) {
+        var idx = roleCompareRoles.indexOf(r);
+        var cls = r === best ? ' role-chart-bar best' : ' role-chart-bar';
+        html += '<div class="role-chart-row">'
+          + '<div class="role-chart-label">' + escapeHtml(r.role) + '</div>'
+          + '<div class="role-chart-bar-wrap"><div class="' + cls + '" style="width:' + r.overall_score + '%"></div></div>'
+          + '<div class="role-chart-score">' + r.overall_score + '%</div>'
+          + '<button type="button" class="role-remove-btn" data-role-idx="' + idx + '">&times;</button>'
+          + '</div>';
+      });
+      html += '</div>';
+
+      /* best fit */
+      html += '<div class="role-strongest-note"><strong>Best Fit: ' + escapeHtml(best.role) + '</strong> \u2014 '
+        + best.overall_score + '% compatibility. '
+        + best.matched_count + ' skills matched, ' + best.missing_count + ' missing.</div>';
+
+      /* detail cards */
+      html += '<div class="role-detail-grid">';
+      sorted.forEach(function(r) {
+        var cls = r === best ? ' role-detail-card strongest' : ' role-detail-card';
+        html += '<div class="' + cls + '">' + '<div class="role-detail-head">' + '<span class="role-detail-name">' + escapeHtml(r.role) + '</span>' + '<span class="role-detail-score">' + r.overall_score + '%</span>' + '</div>';
+        if (r.matched_skills.length) {
+          html += '<div class="role-skills-section"><div class="role-skills-label">Matched</div><div class="role-skills-chips">';
+          r.matched_skills.forEach(function(s) {
+            html += '<span class="chip chip-success" style="font-size:0.75rem;padding:0.15rem 0.45rem">' + escapeHtml(s) + '</span>';
+          });
+          html += '</div></div>';
+        }
+        if (r.missing_skills.length) {
+          html += '<div class="role-skills-section"><div class="role-skills-label">Missing</div><div class="role-skills-chips">';
+          r.missing_skills.forEach(function(s) {
+            html += '<span class="chip chip-danger" style="font-size:0.75rem;padding:0.15rem 0.45rem">' + escapeHtml(s) + '</span>';
+          });
+          html += '</div></div>';
+        }
+        html += '</div>';
+      });
+      html += '</div>';
+
+      roleResultsEl.innerHTML = html;
+
+      /* attach remove handlers */
+      roleResultsEl.querySelectorAll('.role-remove-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var idx = parseInt(this.getAttribute('data-role-idx'), 10);
+          roleCompareRoles.splice(idx, 1);
+          try { sessionStorage.setItem(storageKey, JSON.stringify(roleCompareRoles)); } catch(e) {}
+          renderRoleComparison();
+        });
+      });
+    }
+
+    /* load persisted */
+    try {
+      var stored = sessionStorage.getItem(storageKey);
+      if (stored) {
+        roleCompareRoles = JSON.parse(stored);
+        if (roleCompareRoles.length > 0) renderRoleComparison();
+      }
+    } catch(e) {}
+
+    /* add role button */
+    if (addRoleBtn) {
+      addRoleBtn.addEventListener('click', function() {
+        var jdEl = document.getElementById('addRoleJD');
+        var nameEl = document.getElementById('addRoleName');
+        var jdText = jdEl ? jdEl.value.trim() : '';
+        var roleName = (nameEl && nameEl.value.trim()) ? nameEl.value.trim() : 'Role ' + (roleCompareRoles.length + 1);
+
+        if (!jdText) {
+          alert('Please paste a job description first.');
+          return;
+        }
+
+        for (var i = 0; i < roleCompareRoles.length; i++) {
+          if (roleCompareRoles[i].role.toLowerCase() === roleName.toLowerCase()) {
+            alert('A role named "' + roleName + '" already exists.');
+            return;
+          }
+        }
+
+        addRoleBtn.disabled = true;
+        addRoleBtn.textContent = 'Analyzing...';
+
+        fetch('/api/analyze-for-role', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ current_token: token, job_description: jdText, role_name: roleName })
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (data.error) throw new Error(data.error);
+          roleCompareRoles.push({
+            role: data.role_name || roleName,
+            overall_score: data.overall_score || 0,
+            skill_match: data.skill_match || 0,
+            matched_count: (data.matched_skills || []).length,
+            missing_count: (data.missing_skills || []).length,
+            matched_skills: (data.matched_skills || []).slice(0, 8).map(function(s) { return s.name || s; }),
+            missing_skills: (data.missing_skills || []).slice(0, 8).map(function(s) { return s.name || s; })
+          });
+          try { sessionStorage.setItem(storageKey, JSON.stringify(roleCompareRoles)); } catch(e) {}
+          renderRoleComparison();
+          jdEl.value = '';
+          nameEl.value = '';
+        })
+        .catch(function(err) { alert(err.message || 'Failed to analyze role.'); })
+        .finally(function() { addRoleBtn.disabled = false; addRoleBtn.textContent = 'Add Role & Analyze'; });
+      });
+    }
+
+  });
+})();
+</script>
+<style>  /* ---- Missing card actions ---- */
+  .missing-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .simulate-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: var(--accent);
+    border: 1px solid var(--accent-soft);
+    background: var(--accent-soft);
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .simulate-btn:hover {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+
+  /* ---- Simulation Modal ---- */
+  .sim-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+  .sim-modal-overlay.active {
+    display: flex;
+    opacity: 1;
+  }
+
+  .sim-modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    width: 90%;
+    max-width: 520px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    transform: translateY(10px);
+    transition: transform 0.25s ease;
+  }
+  .sim-modal-overlay.active .sim-modal {
+    transform: translateY(0);
+  }
+
+  .sim-modal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sim-modal-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-headings);
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--text);
+  }
+
+  .sim-modal-close {
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: var(--surface-2);
+    border-radius: 6px;
+    font-size: 1.1rem;
+    color: var(--muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s;
+  }
+  .sim-modal-close:hover {
+    background: var(--danger-soft);
+    color: var(--danger);
+  }
+
+  .sim-modal-body {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .sim-loading {
+    text-align: center;
+    padding: 1rem 0;
+  }
+  .sim-loading .spinner {
+    margin: 0 auto 0.75rem;
+  }
+  .sim-loading p {
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  /* Simulation result */
+  .sim-result-skill {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+  }
+  .sim-result-skill span {
+    color: var(--accent);
+  }
+
+  .sim-scores {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .sim-score-card {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+  }
+  .sim-score-card.projected {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  .sim-score-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    margin-bottom: 0.35rem;
+  }
+
+  .sim-score-value {
+    font-family: var(--font-headings);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+  }
+  .sim-score-card.projected .sim-score-value {
+    color: var(--accent);
+  }
+
+  .sim-delta {
+    display: inline-block;
+    margin-top: 0.35rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+  }
+  .sim-delta.positive {
+    background: var(--success-soft);
+    color: var(--success);
+  }
+  .sim-delta.neutral {
+    background: var(--surface-2);
+    color: var(--muted);
+  }
+
+  .sim-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    color: var(--muted);
+  }
+
+  .sim-explanation {
+    background: var(--surface-2);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 0.85rem 1rem;
+    margin-bottom: 1rem;
+  }
+  .sim-explanation p {
+    margin: 0;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    color: var(--text);
+  }
+
+  .sim-breakdown {
+    margin-top: 0.5rem;
+  }
+  .sim-breakdown h4 {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    margin: 0 0 0.5rem;
+  }
+  .sim-breakdown-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.35rem 0;
+    font-size: 0.85rem;
+    color: var(--text);
+  }
+  .sim-breakdown-row .label {
+    color: var(--muted);
+  }
+  .sim-breakdown-row .values {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+  }
+  .sim-breakdown-row .values .arrow {
+    color: var(--muted);
+    font-size: 0.75rem;
+  }
+  .sim-breakdown-row .values .new-val {
+    color: var(--accent);
+  }
+
+  .sim-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    background: var(--warning-soft);
+    color: var(--warning);
+  }
+
+  .sim-footer-note {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.78rem;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  /* Responsive */
+  @media (max-width: 480px) {
+    .sim-scores {
+      grid-template-columns: 1fr;
+    }
+    .sim-arrow {
+      transform: rotate(90deg);
+    }
+  }
+
+  /* ==================== NEW V2 FEATURES CSS ==================== */
+
+  /* Feature 1: Job Description Insights */
+  .insights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1rem;
+  }
+  .insight-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.15rem;
+    transition: box-shadow 0.2s ease;
+  }
+  .insight-card:hover {
+    box-shadow: 0 4px 12px rgba(var(--shadow-color), 0.06);
+  }
+  .insight-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    margin-bottom: 0.35rem;
+  }
+  .insight-value {
+    margin-bottom: 0.5rem;
+  }
+  .insight-badge {
+    display: inline-block;
+    padding: 0.15rem 0.55rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .insight-badge.high { background: var(--danger-soft); color: var(--danger); }
+  .insight-badge.moderate { background: var(--warning-soft); color: var(--warning); }
+  .insight-badge.low { background: var(--success-soft); color: var(--success); }
+  .insight-badge.neutral { background: var(--surface-2); color: var(--muted); }
+  .insight-desc {
+    font-size: 0.82rem;
+    line-height: 1.45;
+    color: var(--muted);
+  }
+
+  /* Feature 2: Hidden Strengths */
+  .hidden-strength-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 10px 10px 0;
+    padding: 1rem 1.15rem;
+  }
+  .hs-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.4rem;
+  }
+  .hs-skill {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text);
+  }
+  .hs-evidence {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-bottom: 0.35rem;
+    padding: 0.4rem 0.6rem;
+    background: var(--surface-2);
+    border-radius: 6px;
+  }
+  .hs-evidence-label {
+    font-weight: 600;
+    color: var(--text);
+    font-size: 0.75rem;
+  }
+  .hs-recommendation {
+    font-size: 0.82rem;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  /* Feature 3: Career Story Consistency */
+  .cc-score-wrap {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+  }
+  .cc-score-ring {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0;
+  }
+  .cc-score-ring svg { width: 100%; height: 100%; }
+  .cc-ring-track { fill: none; stroke: var(--surface-2); stroke-width: 8; }
+  .cc-ring-fill {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 8;
+    stroke-linecap: round;
+    transform: rotate(-90deg);
+    transform-origin: center;
+    transition: stroke-dashoffset 1s ease;
+  }
+  .cc-score-num {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-headings);
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .cc-explanation {
+    flex: 1;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+  .cc-section { margin-top: 0.75rem; }
+  .cc-section-title {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.35rem;
+  }
+  .cc-section-title.cc-strong { color: var(--success); }
+  .cc-section-title.cc-gap { color: var(--warning); }
+  .cc-item {
+    font-size: 0.85rem;
+    color: var(--text);
+    padding: 0.25rem 0;
+    line-height: 1.4;
+  }
+
+  /* Feature 4: What Could Improve My Score */
+  .improve-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .improve-option {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    font-size: 0.88rem;
+    color: var(--text);
+  }
+  .improve-option:hover {
+    background: var(--surface-2);
+  }
+  .improve-option:has(.improve-cb:checked) {
+    border-color: var(--primary);
+    background: var(--primary-soft);
+  }
+  .improve-cb { display: none; }
+  .improve-cb-custom {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .improve-cb:checked + .improve-cb-custom {
+    background: var(--primary);
+    border-color: var(--primary);
+  }
+  .improve-cb:checked + .improve-cb-custom::after {
+    content: "✓";
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+  .improve-option-text {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .sim-result-wrap {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+  .sim-contributions { margin-top: 0.75rem; }
+  .sim-contributions h4 {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    margin: 0 0 0.4rem;
+  }
+  .sim-contrib-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 0;
+    font-size: 0.82rem;
+  }
+  .sim-contrib-skill { font-weight: 600; flex: 1; }
+  .sim-contrib-badge { font-size: 0.65rem; }
+  .sim-contrib-delta { color: var(--success); font-weight: 600; }
+
+  /* Feature 5: Skill Dependency Map (Interactive) */
+  .dep-summary { display:flex; gap:1.25rem; margin-bottom:1rem; flex-wrap:wrap; }
+  .dep-count { font-size:0.85rem; color:var(--muted); }
+  .dep-count strong { color:var(--text); }
+  .dep-count.have strong { color:var(--success); }
+  .dep-count.gap strong { color:var(--danger); }
+  .dep-filters { display:flex; gap:0.5rem; margin-bottom:1rem; flex-wrap:wrap; }
+  .dep-filter-btn { padding:0.4rem 0.9rem; border-radius:20px; border:1px solid var(--border); background:var(--surface); color:var(--muted); font-size:0.82rem; font-weight:500; cursor:pointer; transition:all 0.15s ease; }
+  .dep-filter-btn:hover { border-color:var(--primary); color:var(--primary); }
+  .dep-filter-btn.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+  .dep-map { text-align:center; overflow-x:auto; }
+  .dep-map svg { max-width:100%; height:auto; }
+  .dep-layer-label { font-size:11px; font-weight:600; fill:var(--muted); text-anchor:start; }
+  .dep-circle { fill:var(--surface-2); stroke-width:2.5; transition:all 0.15s ease; }
+  .dep-node:hover .dep-circle { stroke-width:3.5; filter:drop-shadow(0 2px 8px rgba(0,0,0,0.15)); }
+  .dep-node-matched .dep-circle { fill:rgba(22,163,74,0.12); stroke:var(--success); }
+  .dep-node-missing .dep-circle { fill:rgba(220,38,38,0.12); stroke:var(--danger); }
+  .dep-node-missing.dep-critical .dep-circle { fill:rgba(220,38,38,0.2); stroke:var(--danger); stroke-width:3; }
+  .dep-node-supporting .dep-circle { fill:var(--surface-2); stroke:var(--muted); }
+  .dep-label { font-size:11px; font-weight:600; fill:var(--text); pointer-events:none; }
+  .dep-edge { stroke:var(--border); stroke-width:1.5; }
+  .dep-arrow-path { fill:var(--border); }
+  .dep-legend { display:flex; justify-content:center; gap:1.25rem; margin-top:0.75rem; font-size:0.78rem; color:var(--muted); flex-wrap:wrap; }
+  .dep-legend-item { display:flex; align-items:center; gap:0.35rem; }
+  .dep-dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+  .dep-dot.matched { background:var(--success); }
+  .dep-dot.missing { background:var(--danger); }
+  .dep-dot.recommended { background:#F59E0B; }
+  .dep-dot.supporting { background:var(--muted); }
+  /* Detail panel */
+  .dep-detail-panel { position:fixed; inset:0; z-index:9999; display:none; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px); align-items:center; justify-content:center; opacity:0; transition:opacity 0.25s ease; }
+  .dep-detail-panel.active { display:flex; opacity:1; }
+  .dep-detail-inner { background:var(--surface); border:1px solid var(--border); border-radius:14px; width:90%; max-width:480px; max-height:80vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.2); }
+  .dep-detail-head { display:flex; justify-content:space-between; align-items:center; padding:1rem 1.25rem; border-bottom:1px solid var(--border); }
+  .dep-detail-head h3 { font-size:1rem; font-family:var(--font-headings); }
+  .dep-detail-close { width:28px; height:28px; border:none; background:var(--surface-2); border-radius:6px; font-size:1.1rem; color:var(--muted); cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .dep-detail-close:hover { background:var(--danger-soft); color:var(--danger); }
+  .dep-detail-body { padding:1.25rem; }
+  .dep-detail-row { display:flex; gap:0.75rem; margin-bottom:0.75rem; font-size:0.88rem; }
+  .dep-detail-label { font-weight:600; color:var(--muted); min-width:100px; flex-shrink:0; }
+  .dep-detail-val { color:var(--text); }
+  .dep-detail-val.dep-status-matched { color:var(--success); font-weight:600; }
+  .dep-detail-val.dep-status-missing { color:var(--danger); font-weight:600; }
+  .dep-detail-actions { margin-top:1rem; padding-top:0.75rem; border-top:1px solid var(--border); }
+  /* Recommended */
+  .dep-recommended { display:flex; gap:1rem; align-items:flex-start; padding:1.25rem; background:var(--accent-soft); border:1px solid var(--accent); border-radius:12px; margin-top:1.25rem; }
+  .dep-rec-icon { font-size:1.6rem; flex-shrink:0; }
+  .dep-rec-content h4 { font-size:0.95rem; font-family:var(--font-headings); margin-bottom:0.25rem; }
+  .dep-rec-skill { font-size:1.1rem; font-weight:700; color:var(--accent); margin-bottom:0.3rem; }
+  .dep-rec-reason { font-size:0.85rem; color:var(--muted); margin-bottom:0.75rem; line-height:1.4; }
+  /* Dependency Learning Path (Compact) */
+  .dep-learning-path { margin-top:1rem; }
+  .dep-lp-grid { display:flex; flex-wrap:wrap; gap:0.4rem; align-items:center; }
+  .dep-lp-chip { display:inline-flex; align-items:center; gap:0.4rem; padding:0.35rem 0.65rem; background:var(--surface-2); border:1px solid var(--border); border-radius:20px; font-size:0.8rem; white-space:nowrap; transition:all 0.15s ease; }
+  .dep-lp-chip:hover { border-color:var(--primary); }
+  .dep-lp-num { width:22px; height:22px; border-radius:50%; background:var(--primary-soft); display:inline-flex; align-items:center; justify-content:center; font-size:0.65rem; font-weight:700; color:var(--primary); flex-shrink:0; }
+  .dep-lp-skill { font-weight:600; color:var(--text); font-size:0.8rem; }
+  .dep-lp-badge { font-size:0.7rem; line-height:1; }
+  .dep-lp-badge.already-have { color:var(--success); }
+  .dep-lp-badge.skill-gap { color:var(--danger); }
+  .dep-lp-arrow { color:var(--muted); font-size:0.85rem; flex-shrink:0; }
+  .dep-lp-overflow { display:none; }
+  .dep-lp-overflow.show { display:inline-flex; }
+  .dep-lp-toggle { display:inline-block; margin-top:0.6rem; padding:0.35rem 0.8rem; border:1px solid var(--border); border-radius:16px; background:var(--surface); color:var(--muted); font-size:0.78rem; font-weight:500; cursor:pointer; transition:all 0.15s ease; }
+  .dep-lp-toggle:hover { border-color:var(--primary); color:var(--primary); }
+
+  /* Feature 6: Learning Path */
+  .learning-path {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .lp-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    position: relative;
+    padding: 0.75rem 0;
+  }
+  .lp-step:not(:last-child)::before {
+    content: "";
+    position: absolute;
+    left: 17px;
+    top: 38px;
+    bottom: -4px;
+    width: 2px;
+    background: var(--border);
+  }
+  .lp-num {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--primary-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    z-index: 1;
+  }
+  .lp-num-inner {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--primary);
+  }
+  .lp-content {
+    flex: 1;
+    padding: 0.35rem 0;
+  }
+  .lp-skill {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text);
+    margin-bottom: 0.15rem;
+  }
+  .lp-reason {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-bottom: 0.35rem;
+  }
+  .lp-actions {
+    display: flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+  }
+  .lp-status-btn {
+    padding: 0.2rem 0.55rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--muted);
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .lp-status-btn:hover { border-color: var(--primary); color: var(--primary); }
+  .lp-status-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .lp-step.lp-learning .lp-num { background: var(--warning-soft); }
+  .lp-step.lp-learning .lp-num-inner { color: var(--warning); }
+  .lp-step.lp-completed .lp-num { background: var(--success-soft); }
+  .lp-step.lp-completed .lp-num-inner { color: var(--success); }
+  .lp-step.lp-completed .lp-skill { text-decoration: line-through; opacity: 0.7; }
+
+  /* Feature 7: Resume Version Comparison */
+  .version-cta {
+    text-align: center;
+    padding: 1rem 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  .version-upload-row { margin-top: 0.75rem; }
+  .version-compare-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .version-col {
+    text-align: center;
+    padding: 1rem;
+    background: var(--surface-2);
+    border-radius: 10px;
+  }
+  .version-col-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    margin-bottom: 0.25rem;
+  }
+  .version-col-score {
+    font-family: var(--font-headings);
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .version-col-detail {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 0.2rem;
+  }
+  .version-col-arrow {
+    font-size: 1.3rem;
+    color: var(--muted);
+  }
+  .version-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+  .version-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.35rem 0;
+    font-size: 0.85rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .version-row:last-child { border-bottom: none; }
+  .version-row-label { color: var(--muted); }
+  .version-row-val { font-weight: 600; color: var(--text); }
+  .version-row-val.success { color: var(--success); }
+  .version-row-val.danger { color: var(--danger); }
+  .version-row-val.muted { color: var(--muted); font-weight: 500; }
+
+  /* Feature 8: Role Comparison */
+  .role-add-form { margin-bottom: 1rem; }
+  .role-empty {
+    text-align: center;
+    padding: 1.5rem;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  .role-remove-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0.1rem 0.35rem;
+    border-radius: 4px;
+    transition: color 0.15s, background 0.15s;
+    line-height: 1;
+  }
+  .role-remove-btn:hover { color: var(--danger); background: rgba(239,68,68,0.1); }
+
+  /* Bar chart */
+  .role-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  .role-chart-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .role-chart-label {
+    width: 140px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text);
+    text-align: right;
+    flex-shrink: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .role-chart-bar-wrap {
+    flex: 1;
+    height: 22px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .role-chart-bar {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 4px;
+    transition: width 0.6s ease;
+    opacity: 0.75;
+  }
+  .role-chart-bar.best {
+    background: var(--success);
+    opacity: 1;
+  }
+  .role-chart-score {
+    width: 40px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text);
+    flex-shrink: 0;
+  }
+
+  /* Best fit banner */
+  .role-strongest-note {
+    padding: 0.75rem 1rem;
+    background: var(--success-soft);
+    border-left: 3px solid var(--success);
+    border-radius: 0 8px 8px 0;
+    font-size: 0.85rem;
+    color: var(--text);
+    margin-bottom: 1rem;
+  }
+
+  /* Role detail cards */
+  .role-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 0.75rem;
+  }
+  .role-detail-card {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    transition: border-color 0.2s;
+  }
+  .role-detail-card.strongest {
+    border-color: var(--success);
+  }
+  .role-detail-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+  .role-detail-name {
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: var(--text);
+  }
+  .role-detail-score {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary);
+  }
+  .role-detail-card.strongest .role-detail-score { color: var(--success); }
+  .role-skills-section {
+    margin-top: 0.35rem;
+  }
+  .role-skills-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: var(--muted);
+    margin-bottom: 0.2rem;
+  }
+  .role-skills-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+  @media (max-width: 640px) {
+    .role-chart-label { width: 100px; font-size: 0.75rem; }
+    .role-detail-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ---- Skill Priority List ---- */
+  .priority-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .priority-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .priority-label {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    margin-bottom: 0.25rem;
+    width: fit-content;
+  }
+  .priority-label.high {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+  }
+  .priority-label.medium {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+  }
+  .priority-label.low {
+    background: rgba(107, 114, 128, 0.15);
+    color: #6b7280;
+  }
+  .priority-item {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    padding: 0.35rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .priority-item:last-child {
+    border-bottom: none;
+  }
+  .priority-skill {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .priority-reason {
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+  @media (max-width: 640px) {
+    .priority-item {
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+  }
+</style>
+{% endblock %}

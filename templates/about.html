@@ -1,0 +1,543 @@
+{% extends "base.html" %}
+{% block title %}About — TalentLens{% endblock %}
+
+{% block content %}
+<style>
+/* ---- About Page Premium Styles ---- */
+.about-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 5rem 0 4rem;
+  text-align: center;
+}
+.about-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(50% 60% at 25% 20%, rgba(37,99,235,0.15), transparent 70%),
+    radial-gradient(50% 60% at 75% 30%, rgba(124,58,237,0.12), transparent 70%),
+    radial-gradient(40% 50% at 50% 80%, rgba(6,182,212,0.08), transparent 60%);
+  pointer-events: none;
+}
+.about-hero-content { position: relative; z-index: 1; }
+
+/* Version badge */
+.tl-version-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--primary-soft);
+  color: var(--primary);
+  border: 1px solid rgba(37,99,235,0.2);
+  margin-bottom: 1.25rem;
+  animation: fadeInUp 0.6s ease both;
+}
+.tl-version-badge .pulse-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--primary);
+  animation: pulse-subtle 2s ease-in-out infinite;
+}
+
+/* Hero headline */
+.about-hero h1 {
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  animation: fadeInUp 0.6s ease 0.1s both;
+}
+.about-hero h1 .gradient-text {
+  background: linear-gradient(135deg, var(--primary), #06B6D4, var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.about-hero .tagline {
+  font-size: clamp(1.05rem, 2.2vw, 1.3rem);
+  color: var(--muted);
+  max-width: 600px;
+  margin: 0 auto 2rem;
+  line-height: 1.6;
+  animation: fadeInUp 0.6s ease 0.2s both;
+}
+.about-hero-cta {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  animation: fadeInUp 0.6s ease 0.3s both;
+}
+
+/* ---- Career Journey Flow ---- */
+.journey-section {
+  padding: 4rem 0 3rem;
+}
+.journey-section .section-label {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 0.75rem;
+}
+.journey-section h2 {
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  margin-bottom: 0.5rem;
+}
+.journey-section .section-desc {
+  color: var(--muted);
+  max-width: 520px;
+  margin: 0 auto 2.5rem;
+}
+
+.journey-flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  flex-wrap: wrap;
+  padding: 1rem 0;
+}
+.journey-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.25rem 1rem;
+  min-width: 120px;
+  text-align: center;
+  opacity: 0;
+  animation: fadeInUp 0.5s ease both;
+}
+.journey-step:nth-child(1) { animation-delay: 0.1s; }
+.journey-step:nth-child(3) { animation-delay: 0.2s; }
+.journey-step:nth-child(5) { animation-delay: 0.3s; }
+.journey-step:nth-child(7) { animation-delay: 0.4s; }
+.journey-step:nth-child(9) { animation-delay: 0.5s; }
+.journey-step:nth-child(11) { animation-delay: 0.6s; }
+
+.journey-icon {
+  width: 56px; height: 56px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  font-size: 1.4rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.journey-step:hover .journey-icon {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px -8px rgba(var(--shadow-color), 0.35);
+  border-color: var(--primary);
+}
+.journey-step .step-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.journey-arrow {
+  font-size: 1rem;
+  color: var(--muted);
+  flex-shrink: 0;
+  opacity: 0.5;
+}
+
+/* ---- Glassmorphism Feature Cards ---- */
+.features-section {
+  padding: 3rem 0 4rem;
+}
+.features-section .section-label {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+}
+.features-section h2 {
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.feature-glass-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+.feature-glass-card {
+  position: relative;
+  padding: 1.75rem;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  overflow: hidden;
+}
+.feature-glass-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.feature-glass-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 50px -15px rgba(var(--shadow-color), 0.4);
+  border-color: rgba(37,99,235,0.3);
+}
+.feature-glass-card:hover::before { opacity: 1; }
+.feature-glass-card .fg-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+.feature-glass-card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+.feature-glass-card p {
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+/* ---- Who It's For ---- */
+.audience-section {
+  padding: 3rem 0;
+}
+.audience-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+.audience-card {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.audience-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px -10px rgba(var(--shadow-color), 0.3);
+}
+.audience-card .aud-icon {
+  font-size: 1.8rem;
+  margin-bottom: 0.6rem;
+}
+.audience-card h4 {
+  font-size: 0.92rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+.audience-card p {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+/* ---- Creator Section ---- */
+.creator-section {
+  padding: 4rem 0 2rem;
+}
+.creator-card {
+  position: relative;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 2.5rem;
+  border-radius: 22px;
+  background: linear-gradient(135deg, rgba(37,99,235,0.06), rgba(124,58,237,0.06), rgba(6,182,212,0.04));
+  border: 1px solid var(--border);
+  text-align: center;
+  overflow: hidden;
+}
+.creator-card::before {
+  content: "";
+  position: absolute;
+  top: -1px; left: 20%; right: 20%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), #06B6D4, var(--accent));
+  border-radius: 0 0 3px 3px;
+}
+.creator-card .creator-eyebrow {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 1rem;
+}
+.creator-card .creator-avatar {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  margin: 0 auto 1rem;
+  display: grid;
+  place-items: center;
+  font-size: 1.6rem;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: #fff;
+  font-weight: 700;
+  font-family: var(--font-headings);
+  box-shadow: 0 8px 24px -4px rgba(37,99,235,0.35);
+}
+.creator-card h3 {
+  font-size: 1.3rem;
+  margin-bottom: 0.35rem;
+}
+.creator-card .creator-role {
+  color: var(--primary);
+  font-size: 0.88rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+.creator-card .creator-desc {
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.6;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* ---- CTA Section ---- */
+.about-cta {
+  padding: 3rem 0 4rem;
+  text-align: center;
+}
+.about-cta-card {
+  position: relative;
+  padding: 3rem 2rem;
+  border-radius: 22px;
+  background: linear-gradient(135deg, var(--primary), #06B6D4);
+  overflow: hidden;
+}
+.about-cta-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 50%, rgba(255,255,255,0.12), transparent 50%),
+    radial-gradient(circle at 80% 30%, rgba(255,255,255,0.08), transparent 50%);
+  pointer-events: none;
+}
+.about-cta-card h2 {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  color: #fff;
+  margin-bottom: 0.5rem;
+  position: relative;
+}
+.about-cta-card p {
+  color: rgba(255,255,255,0.85);
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+.about-cta-card .btn {
+  position: relative;
+}
+.about-cta-card .btn-white {
+  background: #fff;
+  color: var(--primary);
+  border: none;
+  font-weight: 700;
+}
+.about-cta-card .btn-white:hover {
+  background: #f0f0f0;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 900px) {
+  .feature-glass-grid { grid-template-columns: repeat(2, 1fr); }
+  .audience-grid { grid-template-columns: repeat(2, 1fr); }
+  .journey-flow { gap: 0.25rem; }
+  .journey-step { min-width: 90px; padding: 1rem 0.5rem; }
+  .journey-step .step-label { font-size: 0.75rem; }
+}
+@media (max-width: 600px) {
+  .feature-glass-grid { grid-template-columns: 1fr; }
+  .audience-grid { grid-template-columns: 1fr 1fr; }
+  .journey-flow { flex-direction: column; gap: 0; }
+  .journey-arrow { transform: rotate(90deg); }
+  .journey-step { min-width: auto; }
+}
+</style>
+
+<!-- ========== HERO ========== -->
+<section class="about-hero">
+  <div class="container about-hero-content">
+    <div class="tl-version-badge">
+      <span class="pulse-dot"></span>
+      TalentLens v3.0
+    </div>
+    <h1><span class="gradient-text">See Your Potential.</span><br>Build Your Future.</h1>
+    <p class="tagline">TalentLens is a career readiness platform that transforms your resume into a strategic roadmap — revealing skill gaps, matching opportunities, and guiding your path to the right role.</p>
+    <div class="about-hero-cta">
+      <a class="btn btn-primary btn-lg" href="{{ url_for('analyze_page') }}">Analyze Your Resume</a>
+      <a class="btn btn-ghost btn-lg" href="#journey">See How It Works</a>
+    </div>
+  </div>
+</section>
+
+<!-- ========== CAREER JOURNEY FLOW ========== -->
+<section class="journey-section" id="journey">
+  <div class="container" style="text-align:center">
+    <div class="section-label">Your Career Journey</div>
+    <h2>From Resume to Hired</h2>
+    <p class="section-desc" style="margin-left:auto; margin-right:auto">A clear, guided path that takes you from raw resume data to a polished, job-ready profile.</p>
+
+    <div class="journey-flow">
+      <div class="journey-step">
+        <div class="journey-icon" style="background:rgba(37,99,235,0.1); color:var(--primary)">&#128196;</div>
+        <span class="step-label">Analyze</span>
+      </div>
+      <div class="journey-arrow">&rarr;</div>
+      <div class="journey-step">
+        <div class="journey-icon" style="background:rgba(6,182,212,0.1); color:#06B6D4">&#128270;</div>
+        <span class="step-label">Match</span>
+      </div>
+      <div class="journey-arrow">&rarr;</div>
+      <div class="journey-step">
+        <div class="journey-icon" style="background:rgba(124,58,237,0.1); color:var(--accent)">&#9888;&#65039;</div>
+        <span class="step-label">Identify Gaps</span>
+      </div>
+      <div class="journey-arrow">&rarr;</div>
+      <div class="journey-step">
+        <div class="journey-icon" style="background:rgba(16,185,129,0.1); color:#10B981">&#128218;</div>
+        <span class="step-label">Learn</span>
+      </div>
+      <div class="journey-arrow">&rarr;</div>
+      <div class="journey-step">
+        <div class="journey-icon" style="background:rgba(245,158,11,0.1); color:#F59E0B">&#128640;</div>
+        <span class="step-label">Improve</span>
+      </div>
+      <div class="journey-arrow">&rarr;</div>
+      <div class="journey-step">
+        <div class="journey-icon" style="background:rgba(37,99,235,0.12); color:var(--primary)">&#127942;</div>
+        <span class="step-label">Get Hired</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== FEATURES (Glassmorphism Cards) ========== -->
+<section class="features-section">
+  <div class="container">
+    <div style="text-align:center">
+      <div class="section-label">What You Get</div>
+      <h2>Everything You Need to Stand Out</h2>
+    </div>
+
+    <div class="feature-glass-grid" style="margin-top:2rem">
+      <div class="feature-glass-card">
+        <div class="fg-icon">&#128202;</div>
+        <h3>ATS Compatibility Score</h3>
+        <p>Get a detailed breakdown of how your resume scores against Applicant Tracking Systems — with clear explanations.</p>
+      </div>
+      <div class="feature-glass-card">
+        <div class="fg-icon">&#127919;</div>
+        <h3>Skill Gap Detection</h3>
+        <p>Instantly identify missing skills classified by importance — critical, important, or optional — so you know what to learn first.</p>
+      </div>
+      <div class="feature-glass-card">
+        <div class="fg-icon">&#128218;</div>
+        <h3>Learning Resources</h3>
+        <p>Get curated articles, videos, and documentation matched to each skill gap — start closing the gap immediately.</p>
+      </div>
+      <div class="feature-glass-card">
+        <div class="fg-icon">&#128172;</div>
+        <h3>Interview Preparation</h3>
+        <p>Practice with role-specific interview questions generated from the job description, matched skills, and missing skills.</p>
+      </div>
+      <div class="feature-glass-card">
+        <div class="fg-icon">&#128200;</div>
+        <h3>Interactive Analytics</h3>
+        <p>Visualize your compatibility, skill distribution, and keyword match through beautiful, interactive charts and dashboards.</p>
+      </div>
+      <div class="feature-glass-card">
+        <div class="fg-icon">&#9997;&#65039;</div>
+        <h3>Resume Builder</h3>
+        <p>Build a professional, ATS-friendly resume with live preview, multiple templates, and AI-powered summary improvements.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== WHO IT'S FOR ========== -->
+<section class="audience-section">
+  <div class="container">
+    <div style="text-align:center; margin-bottom:2rem">
+      <div class="section-label" style="color:var(--success)">Who It's For</div>
+      <h2 style="font-size:clamp(1.6rem,3vw,2.2rem)">Built for Every Career Stage</h2>
+    </div>
+
+    <div class="audience-grid">
+      <div class="audience-card">
+        <div class="aud-icon">&#127891;</div>
+        <h4>Students</h4>
+        <p>Exploring career paths and building your first resume</p>
+      </div>
+      <div class="audience-card">
+        <div class="aud-icon">&#128188;</div>
+        <h4>Interns</h4>
+        <p>Strengthening your profile for your next opportunity</p>
+      </div>
+      <div class="audience-card">
+        <div class="aud-icon">&#127775;</div>
+        <h4>Fresh Graduates</h4>
+        <p>Entering the job market with confidence</p>
+      </div>
+      <div class="audience-card">
+        <div class="aud-icon">&#128640;</div>
+        <h4>Job Seekers</h4>
+        <p>Targeting specific roles with precision</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== CREATOR SECTION ========== -->
+<section class="creator-section">
+  <div class="container">
+    <div class="creator-card">
+      <div class="creator-eyebrow">The Creator</div>
+      <div class="creator-avatar">OA</div>
+      <h3>Ojuswi Agrawal</h3>
+      <div class="creator-role">Envisioned, Designed &amp; Developed</div>
+      <p class="creator-desc">TalentLens was born from a simple belief: everyone deserves to understand how their skills align with the roles they aspire to. Built with care to make career readiness accessible to all.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== CTA ========== -->
+<section class="about-cta">
+  <div class="container">
+    <div class="about-cta-card">
+      <h2>Ready to See Your Potential?</h2>
+      <p>Upload your resume and paste a job description — get your full compatibility breakdown in seconds.</p>
+      <a class="btn btn-white btn-lg" href="{{ url_for('analyze_page') }}">Analyze Your Resume</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

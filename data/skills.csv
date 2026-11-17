@@ -1,0 +1,157 @@
+skill,category,aliases
+Python,Programming Languages,python,python3,py
+Java,Programming Languages,java
+JavaScript,Programming Languages,javascript,js,ecmascript
+TypeScript,Programming Languages,typescript,ts
+C,Programming Languages,c programming,c lang
+C++,Programming Languages,c++,cpp
+C#,Programming Languages,c#
+Go,Programming Languages,golang,go lang
+Rust,Programming Languages,rust
+R,Programming Languages,r programming,rstudio
+Ruby,Programming Languages,ruby,ruby on rails
+PHP,Programming Languages,php
+Swift,Programming Languages,swift
+Kotlin,Programming Languages,kotlin
+Scala,Programming Languages,scala
+MATLAB,Programming Languages,matlab
+SQL,Programming Languages,sql
+HTML,Programming Languages,html
+CSS,Programming Languages,css
+Bash,Programming Languages,bash,shell scripting
+Shell,Programming Languages,shell,unix shell
+LaTeX,Programming Languages,latex
+Machine Learning,Machine Learning & AI,machine learning,ml
+Deep Learning,Machine Learning & AI,deep learning,dl
+Neural Networks,Machine Learning & AI,neural network,neural networks
+Natural Language Processing,Machine Learning & AI,natural language processing,nlp
+Computer Vision,Machine Learning & AI,computer vision,cv
+Computer Vision,Machine Learning & AI,opencv
+Large Language Models,Machine Learning & AI,llm,large language model,llms
+Prompt Engineering,Machine Learning & AI,prompt engineering,prompting
+Statistics,Mathematics & Statistics,statistics,statistical analysis
+Probability,Mathematics & Statistics,probability,probability theory
+Regression,Mathematics & Statistics,regression,linear regression,logistic regression
+Classification,Machine Learning & AI,classification
+Clustering,Machine Learning & AI,clustering,k means,k-means
+Feature Engineering,Machine Learning & AI,feature engineering,feature extraction
+Exploratory Data Analysis,Machine Learning & AI,exploratory data analysis,eda
+Hypothesis Testing,Mathematics & Statistics,hypothesis testing,statistical testing
+Time Series,Machine Learning & AI,time series,time series analysis
+Recommendation Systems,Machine Learning & AI,recommendation system,recommendation systems,recommender system
+Reinforcement Learning,Machine Learning & AI,reinforcement learning,rl
+Data Mining,Machine Learning & AI,data mining
+Scikit-learn,Machine Learning & AI,scikit-learn,sklearn,scikit learn
+TensorFlow,Machine Learning & AI,tensorflow,tf
+PyTorch,Machine Learning & AI,pytorch,torch
+Keras,Machine Learning & AI,keras
+XGBoost,Machine Learning & AI,xgboost,xgb
+LightGBM,Machine Learning & AI,lightgbm,lgbm
+Hugging Face,Machine Learning & AI,hugging face,huggingface,hf transformers
+LangChain,Machine Learning & AI,langchain,lang chain
+MLflow,Machine Learning & AI,mlflow
+NLTK,Machine Learning & AI,nltk
+spaCy,Machine Learning & AI,spacy,spa cy
+Pandas,Data Processing & Engineering,pandas
+NumPy,Data Processing & Engineering,numpy,np
+Apache Spark,Data Processing & Engineering,apache spark,spark,pyspark
+PySpark,Data Processing & Engineering,pyspark
+Dask,Data Processing & Engineering,dask
+Apache Airflow,Data Processing & Engineering,apache airflow,airflow
+dbt,Data Processing & Engineering,dbt,data build tool
+Apache Kafka,Data Processing & Engineering,apache kafka,kafka
+Hadoop,Data Processing & Engineering,hadoop
+Apache Hive,Data Processing & Engineering,hive,hiveql
+ETL,Data Processing & Engineering,etl,extract transform load
+Data Warehousing,Data Processing & Engineering,data warehouse,data warehousing
+Matplotlib,Data Visualization,matplotlib,mpl,plt
+Seaborn,Data Visualization,seaborn,sns
+Plotly,Data Visualization,plotly,plotly dash
+Tableau,Data Visualization,tableau
+Power BI,Data Visualization,power bi,powerbi
+Microsoft Excel,Data Visualization,excel,ms excel,spreadsheet
+Google Sheets,Data Visualization,google sheets,sheets
+Looker,Data Visualization,looker,looker studio
+D3.js,Data Visualization,d3,d3.js
+Bokeh,Data Visualization,bokeh
+Qlik,Data Visualization,qlik,qlikview,qliksense
+Data Visualization,Data Visualization,data visualization,dataviz,dashboarding
+MySQL,Databases,mysql
+PostgreSQL,Databases,postgresql,postgres
+MongoDB,Databases,mongodb,mongo
+SQLite,Databases,sqlite
+Oracle,Databases,oracle database,oracle sql
+Redis,Databases,redis
+Cassandra,Databases,cassandra
+Elasticsearch,Databases,elasticsearch,elastic search
+Snowflake,Databases,snowflake
+BigQuery,Databases,bigquery,google bigquery
+Amazon Redshift,Databases,redshift,amazon redshift
+AWS,Cloud & DevOps,aws,amazon web services,amazon s3,aws lambda,aws ec2,aws sagemaker,aws glue
+Amazon S3,Cloud & DevOps,s3,amazon s3
+AWS Lambda,Cloud & DevOps,lambda,aws lambda
+Azure,Cloud & DevOps,microsoft azure,azure
+Google Cloud Platform,Cloud & DevOps,gcp,google cloud platform,google cloud
+Docker,Cloud & DevOps,docker,containers
+Kubernetes,Cloud & DevOps,kubernetes,k8s
+Jenkins,Cloud & DevOps,jenkins
+Git,Version Control & Tools,git
+GitHub,Version Control & Tools,github,git hub
+GitLab,Version Control & Tools,gitlab
+Terraform,Cloud & DevOps,terraform
+Ansible,Cloud & DevOps,ansible
+CI/CD,Cloud & DevOps,ci/cd,continuous integration,continuous deployment
+Linux,Cloud & DevOps,linux,unix
+REST APIs,Web Development,rest api,rest apis,restful api,restful apis,api development
+GraphQL,Web Development,graphql
+React,Web Development,react,react.js,reactjs
+Angular,Web Development,angular,angularjs
+Vue,Web Development,vue,vue.js,vuejs
+Node.js,Web Development,node,node.js,nodejs
+Django,Web Development,django
+Flask,Web Development,flask
+FastAPI,Web Development,fastapi
+Express,Web Development,express,express.js
+Next.js,Web Development,next.js,nextjs
+Bootstrap,Web Development,bootstrap
+Tailwind CSS,Web Development,tailwind,tailwind css
+Ruby on Rails,Web Development,ruby on rails,rails
+Business Analysis,Business & Analytics,business analysis,business analyst
+Data Analysis,Business & Analytics,data analysis,data analyst,analytics
+Data Analytics,Business & Analytics,data analytics,analytics
+Business Intelligence,Business & Analytics,business intelligence,bi tools,power bi,tableau
+Data Storytelling,Business & Analytics,data storytelling,storytelling with data
+Reporting,Business & Analytics,reporting,report building
+KPI,Business & Analytics,kpi,kpis,key performance indicators
+A/B Testing,Business & Analytics,ab testing,a/b testing,experimentation
+Google Analytics,Business & Analytics,google analytics,ga4
+Salesforce,Business & Analytics,salesforce
+Project Management,Professional & Soft Skills,project management,project manager
+Agile,Professional & Soft Skills,agile,agile methodologies
+Scrum,Professional & Soft Skills,scrum
+Communication,Professional & Soft Skills,communication,communication skills
+Leadership,Professional & Soft Skills,leadership
+Teamwork,Professional & Soft Skills,teamwork,collaboration
+Problem Solving,Professional & Soft Skills,problem solving,problem-solving
+Critical Thinking,Professional & Soft Skills,critical thinking
+Presentation,Professional & Soft Skills,presentation,presentations
+Unit Testing,Testing & Quality,unit testing,unit test,testing
+pytest,Testing & Quality,pytest
+Jest,Testing & Quality,jest
+Selenium,Testing & Quality,selenium
+Test Automation,Testing & Quality,test automation,automated testing
+Postman,Testing & Quality,postman
+Research,Professional & Soft Skills,research,research skills
+Documentation,Professional & Soft Skills,documentation,technical writing
+Microsoft Office,Professional & Soft Skills,microsoft office,ms office
+PowerPoint,Professional & Soft Skills,powerpoint
+Google Workspace,Professional & Soft Skills,google workspace,g suite
+Jira,Version Control & Tools,jira
+VS Code,Version Control & Tools,vs code,vscode,visual studio code
+Figma,Web Development,figma
+API Development,Web Development,api development,apis
+Microservices,Web Development,microservices,distributed systems
+System Design,Web Development,system design,software architecture
+Software Engineering,Programming Languages,software engineering,software development
+Data Engineering,Data Processing & Engineering,data engineering,data engineer
+Database Management,Databases,database management,dba

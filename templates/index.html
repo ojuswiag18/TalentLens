@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}TalentLens — Turn Your Resume Into Your Career Roadmap{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="container">
+    <div class="hero-logo">
+      <svg class="hero-logo-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="hero-grad" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#2563EB"/>
+            <stop offset="0.5" stop-color="#06B6D4"/>
+            <stop offset="1" stop-color="#7C3AED"/>
+          </linearGradient>
+        </defs>
+        <circle cx="28" cy="28" r="20" stroke="url(#hero-grad)" stroke-width="4" fill="none"/>
+        <rect x="15" y="34" width="5" height="10" rx="1.5" fill="url(#hero-grad)" opacity="0.7"/>
+        <rect x="22" y="26" width="5" height="18" rx="1.5" fill="url(#hero-grad)" opacity="0.85"/>
+        <rect x="29" y="18" width="5" height="26" rx="1.5" fill="url(#hero-grad)"/>
+        <line x1="42" y1="42" x2="55" y2="55" stroke="url(#hero-grad)" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+      <div class="hero-logo-wordmark">Talent<span class="hl-accent">Lens</span></div>
+      <div class="hero-tagline">
+        <span class="tag-dot"></span>Analyze<span class="tag-dot"></span>Improve<span class="tag-dot"></span>Get Hired
+      </div>
+    </div>
+    <h1 class="tagline">Turn Your Resume Into Your Career Roadmap.</h1>
+    <p class="subtitle">Discover how your resume matches the role, uncover the skills you are missing, and find the right resources to close the gap.</p>
+    <div class="hero-cta">
+      <a class="btn btn-primary btn-lg" href="{{ url_for('analyze_page') }}">Analyze My Resume</a>
+      <a class="btn btn-ghost btn-lg" href="{{ url_for('resources_page') }}">Explore TalentLens</a>
+    </div>
+  </div>
+</section>
+
+<section class="section feature-section">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Premium Features</span>
+      <h2>Everything you need to get job ready</h2>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card fade-in-up">
+        <div class="feature-icon">📄</div>
+        <h3>Resume Compatibility</h3>
+        <p>Understand how closely your resume aligns with a target role.</p>
+      </div>
+      <div class="feature-card fade-in-up delay-1">
+        <div class="feature-icon">🎯</div>
+        <h3>Skill Gap Detection</h3>
+        <p>Identify important skills required by the job that are missing from your resume.</p>
+      </div>
+      <div class="feature-card fade-in-up delay-2">
+        <div class="feature-icon">📚</div>
+        <h3>Personalized Learning</h3>
+        <p>Get resources for the skills you need to improve.</p>
+      </div>
+      <div class="feature-card fade-in-up">
+        <div class="feature-icon">💡</div>
+        <h3>Interview Preparation</h3>
+        <p>Practice questions based on the actual job description.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="grid grid-3">
+      <div class="card feature-card fade-in-up">
+        <div class="feature-icon">📄</div>
+        <h3>Resume Parsing</h3>
+        <p>Upload a PDF and TalentLens extracts and cleans your resume text for analysis.</p>
+      </div>
+      <div class="card feature-card fade-in-up delay-1">
+        <div class="feature-icon">🎯</div>
+        <h3>Compatibility Score</h3>
+        <p>An overall score that measures skills, keywords, experience, education and projects.</p>
+      </div>
+      <div class="card feature-card fade-in-up delay-2">
+        <div class="feature-icon">🧩</div>
+        <h3>Skill Gap Detection</h3>
+        <p>Missing skills are detected and classified by severity — critical, important or optional.</p>
+      </div>
+      <div class="card feature-card fade-in-up">
+        <div class="feature-icon">📚</div>
+        <h3>Learning Resources</h3>
+        <p>Every missing skill links to curated documentation, videos, articles and courses.</p>
+      </div>
+      <div class="card feature-card fade-in-up delay-1">
+        <div class="feature-icon">💡</div>
+        <h3>Improvement Suggestions</h3>
+        <p>Prioritized, actionable advice across skills, keywords, projects and formatting.</p>
+      </div>
+      <div class="card feature-card fade-in-up delay-2">
+        <div class="feature-icon">📊</div>
+        <h3>Interactive Dashboard</h3>
+        <p>Visual charts break down exactly where you match and where you fall short.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="card text-center" style="padding:3rem">
+      <h2 style="margin-bottom:1rem">Ready to see how you measure up?</h2>
+      <p class="muted" style="margin-bottom:1.5rem">Upload your resume, paste a job description, and get your full compatibility breakdown in seconds.</p>
+      <a class="btn btn-primary btn-lg" href="{{ url_for('analyze_page') }}">Analyze My Resume</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

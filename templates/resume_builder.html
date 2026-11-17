@@ -1,0 +1,1317 @@
+{% extends "base.html" %}
+{% block title %}Resume Builder — TalentLens{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width:1400px; padding-top:1.5rem; padding-bottom:2rem">
+
+  <!-- ========== LANDING PAGE ========== -->
+  {% if not analysis and not loaded_resume_id %}
+  <div id="rb-landing">
+    <div style="text-align:center; margin-bottom:2rem">
+      <h1 style="font-size:1.8rem; margin-bottom:0.35rem">Resume Builder</h1>
+      <p style="color:var(--muted); font-size:0.95rem">Create a professional resume your way</p>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; max-width:750px; margin:0 auto">
+
+      <!-- Card 1: Create New -->
+      <div class="card rb-landing-card" id="rb-create-new-card" style="padding:2rem; cursor:pointer; text-align:center; transition:transform 0.2s, box-shadow 0.2s">
+        <div style="font-size:2.2rem; margin-bottom:0.75rem">&#10024;</div>
+        <h3 style="font-size:1.1rem; margin-bottom:0.4rem">Create New Resume</h3>
+        <p style="color:var(--muted); font-size:0.85rem; margin-bottom:1.25rem; line-height:1.5">Build your resume from scratch with guided sections, live preview, and professional templates.</p>
+        <button type="button" class="btn btn-primary" id="rb-create-new-btn">Create New</button>
+      </div>
+
+      <!-- Card 2: Quick Edit -->
+      <div class="card rb-landing-card" id="rb-quick-edit-card" style="padding:2rem; cursor:pointer; text-align:center; transition:transform 0.2s, box-shadow 0.2s">
+        <div style="font-size:2.2rem; margin-bottom:0.75rem">&#9889;</div>
+        <h3 style="font-size:1.1rem; margin-bottom:0.4rem">Quick Edit</h3>
+        <p style="color:var(--muted); font-size:0.85rem; margin-bottom:1.25rem; line-height:1.5">Already have a resume? Quickly update your existing information.</p>
+        <button type="button" class="btn btn-outline" id="rb-quick-edit-btn">Quick Edit</button>
+      </div>
+    </div>
+
+    <!-- Saved Resumes List (shown when Quick Edit is clicked) -->
+    <div id="rb-saved-list-section" style="display:none; max-width:750px; margin:1.5rem auto 0">
+      <div class="card" style="padding:1.5rem">
+        <h3 style="font-size:1.1rem; margin-bottom:0.75rem">Your Saved Resumes</h3>
+        <div id="rb-saved-list"></div>
+        <div id="rb-saved-empty" style="display:none; text-align:center; padding:1.5rem 0; color:var(--muted)">
+          <p style="margin-bottom:0.75rem">No saved resumes found.</p>
+          <button type="button" class="btn btn-primary btn-sm" id="rb-saved-empty-create">Create Your First Resume</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Or analyze first -->
+    {% if not saved_resumes_list or saved_resumes_list|length == 0 %}
+    <div style="text-align:center; margin-top:2rem; padding-top:1.5rem; border-top:1px solid var(--border)">
+      <p style="color:var(--muted); font-size:0.85rem; margin-bottom:0.5rem">Have an existing analysis?</p>
+      <a href="{{ url_for('analyze_page') }}" class="btn btn-outline btn-sm">Analyze Resume First</a>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <!-- ========== CHOICE SCREEN (shown when analysis exists but no saved resume loaded) ========== -->
+  {% if analysis and not loaded_resume_id %}
+  <div id="rb-choice">
+    <div style="text-align:center; margin-bottom:2rem">
+      <h1 style="font-size:1.8rem; margin-bottom:0.35rem">Resume Builder</h1>
+      <p style="color:var(--muted); font-size:0.95rem">How would you like to create your resume?</p>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; max-width:800px; margin:0 auto">
+      <!-- Card: Create New Resume -->
+      <div class="card rb-landing-card" id="rb-choice-new-card" style="padding:2rem; cursor:pointer; text-align:center; transition:transform 0.2s, box-shadow 0.2s">
+        <div style="font-size:2.2rem; margin-bottom:0.75rem">&#10024;</div>
+        <h3 style="font-size:1.1rem; margin-bottom:0.4rem">Create New Resume</h3>
+        <p style="color:var(--muted); font-size:0.85rem; margin-bottom:1.25rem; line-height:1.5">Start from scratch with completely empty fields. Build your resume step by step using the guided editor.</p>
+        <button type="button" class="btn btn-outline" id="rb-choice-new-btn">Create New</button>
+      </div>
+
+      <!-- Card: Create from Analysis -->
+      <div class="card rb-landing-card" id="rb-choice-analysis-card" style="padding:2rem; cursor:pointer; text-align:center; transition:transform 0.2s, box-shadow 0.2s">
+        <div style="font-size:2.2rem; margin-bottom:0.75rem">&#129302;</div>
+        <h3 style="font-size:1.1rem; margin-bottom:0.4rem">Create from Analysis</h3>
+        <p style="color:var(--muted); font-size:0.85rem; margin-bottom:1.25rem; line-height:1.5">Use your latest resume analysis data. Auto-populated with your skills, experience, and AI-powered suggestions.</p>
+        <button type="button" class="btn btn-outline" id="rb-choice-analysis-btn">Create from Analysis</button>
+      </div>
+    </div>
+
+    <!-- Analysis summary info -->
+    <div style="max-width:800px; margin:1.5rem auto 0; text-align:center">
+      <div class="card" style="padding:1rem 1.5rem; display:inline-flex; align-items:center; gap:1.5rem; flex-wrap:wrap; justify-content:center">
+        <div style="display:flex; align-items:center; gap:0.5rem">
+          <span style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; color:var(--muted)">ATS Score</span>
+          <span style="font-family:var(--font-headings); font-size:1.1rem; font-weight:700; color:var(--primary)">{{ analysis.overall_score }}%</span>
+        </div>
+        {% if analysis.matched_skills %}
+        <div style="display:flex; align-items:center; gap:0.5rem">
+          <span style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; color:var(--muted)">Matched Skills</span>
+          <span style="font-family:var(--font-headings); font-size:1.1rem; font-weight:700; color:var(--success)">{{ analysis.matched_skills|length }}</span>
+        </div>
+        {% endif %}
+        {% if analysis.missing_skills %}
+        <div style="display:flex; align-items:center; gap:0.5rem">
+          <span style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; color:var(--muted)">Missing Skills</span>
+          <span style="font-family:var(--font-headings); font-size:1.1rem; font-weight:700; color:var(--warning)">{{ analysis.missing_skills|length }}</span>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- ========== EDITOR (shown when analysis exists, resume_id provided, or Create New clicked) ========== -->
+  <div id="rb-editor" style="{% if not analysis and not loaded_resume_id %}display:none{% endif %}{% if analysis and not loaded_resume_id %}display:none{% endif %}">
+
+    <!-- Header with progress -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.75rem">
+      <div>
+        <div style="display:flex; align-items:center; gap:0.5rem">
+          <button type="button" class="btn btn-outline btn-sm" id="rb-back-btn" style="display:none">&#8592; Back</button>
+          <button type="button" class="btn btn-outline btn-sm" id="rb-switch-btn" style="display:none">&#8644; Switch Mode</button>
+          <h1 style="font-size:1.5rem; margin:0" id="rb-page-title">Resume Builder</h1>
+        </div>
+        <p style="color:var(--muted); margin:0.25rem 0 0; font-size:0.85rem" id="rb-page-subtitle">
+          {% if analysis %}Build an improved, ATS-friendly resume targeted to your job description.{% else %}Fill in your information to build a professional resume.{% endif %}
+        </p>
+      </div>
+      <div style="display:flex; gap:0.5rem; flex-wrap:wrap">
+        <button type="button" class="btn btn-outline btn-sm" id="resetBtn">Reset</button>
+        <button type="button" class="btn btn-outline btn-sm" id="saveBtn">Save Resume</button>
+        <button type="button" class="btn btn-outline btn-sm" id="downloadPdfBtn">Download PDF</button>
+        <button type="button" class="btn btn-outline btn-sm" id="downloadDocxBtn">Download DOCX</button>
+      </div>
+    </div>
+
+    <!-- Progress indicator -->
+    <div class="card" style="padding:0.75rem 1.5rem; margin-bottom:1rem" id="rb-progress-bar">
+      <div style="display:flex; align-items:center; gap:0; font-size:0.78rem; overflow-x:auto">
+        <div class="rb-progress-step active" data-step="1"><span class="rb-progress-num">1</span> Personal</div>
+        <div class="rb-progress-line"></div>
+        <div class="rb-progress-step" data-step="2"><span class="rb-progress-num">2</span> Summary</div>
+        <div class="rb-progress-line"></div>
+        <div class="rb-progress-step" data-step="3"><span class="rb-progress-num">3</span> Experience</div>
+        <div class="rb-progress-line"></div>
+        <div class="rb-progress-step" data-step="4"><span class="rb-progress-num">4</span> Skills</div>
+        <div class="rb-progress-line"></div>
+        <div class="rb-progress-step" data-step="5"><span class="rb-progress-num">5</span> Education</div>
+        <div class="rb-progress-line"></div>
+        <div class="rb-progress-step" data-step="6"><span class="rb-progress-num">6</span> Extras</div>
+        <div class="rb-progress-line"></div>
+        <div class="rb-progress-step" data-step="7"><span class="rb-progress-num">7</span> Done</div>
+      </div>
+    </div>
+
+    <!-- ATS Score Bar (only if analysis exists) -->
+    {% if analysis %}
+    <div class="card" style="padding:1rem 1.5rem; margin-bottom:1rem">
+      <div style="display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap">
+        <div style="display:flex; align-items:center; gap:0.75rem">
+          <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; color:var(--muted)">ATS Score</div>
+          <div id="atsScoreDisplay" style="font-family:var(--font-headings); font-size:1.5rem; font-weight:700; color:var(--primary)">{{ analysis.overall_score }}%</div>
+        </div>
+        <div id="atsOriginalScore" style="display:none; font-size:0.8rem; color:var(--muted)">
+          Original: <span id="atsOrigVal">{{ analysis.overall_score }}%</span> &rarr; New: <span id="atsNewVal">{{ analysis.overall_score }}%</span>
+          (<span id="atsDiff">0</span>)
+        </div>
+        <button type="button" class="btn btn-outline btn-sm" id="recalcBtn">Recalculate ATS Score</button>
+        <div style="flex:1"></div>
+        <div style="display:flex; align-items:center; gap:0.5rem">
+          <span style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; color:var(--muted)">Template:</span>
+          <select id="templateSelect" style="padding:0.35rem 0.75rem; border-radius:6px; border:1px solid var(--border); background:var(--surface-2); color:var(--text); font-size:0.85rem">
+            <option value="modern">Modern</option>
+            <option value="professional">Professional</option>
+            <option value="executive">Executive</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <!-- Template Selector for Create New mode -->
+    <div class="card" style="padding:0.75rem 1.5rem; margin-bottom:1rem">
+      <div style="display:flex; align-items:center; gap:0.5rem">
+        <span style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; color:var(--muted)">Template:</span>
+        <select id="templateSelect" style="padding:0.35rem 0.75rem; border-radius:6px; border:1px solid var(--border); background:var(--surface-2); color:var(--text); font-size:0.85rem">
+          <option value="modern">Modern</option>
+          <option value="professional">Professional</option>
+          <option value="executive">Executive</option>
+        </select>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Main Editor + Preview -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; align-items:start">
+
+      <!-- LEFT: EDITOR -->
+      <div class="card" style="padding:1.5rem; max-height:calc(100vh - 250px); overflow-y:auto" id="editorPanel">
+        <h3 style="font-size:1.1rem; margin-bottom:1rem">Resume Editor</h3>
+
+        <!-- Personal Info -->
+        <div class="rb-section" data-step="1">
+          <h4 class="rb-section-title open" data-toggle="rb-personal">Personal Information</h4>
+          <div class="rb-section-body" id="rb-personal">
+            <input type="text" id="rb-name" placeholder="Full Name" class="rb-input" data-field="personal.name">
+            <input type="email" id="rb-email" placeholder="Email" class="rb-input" data-field="personal.email">
+            <input type="tel" id="rb-phone" placeholder="Phone" class="rb-input" data-field="personal.phone">
+            <input type="text" id="rb-linkedin" placeholder="LinkedIn / Website" class="rb-input" data-field="personal.linkedin">
+            <input type="text" id="rb-github" placeholder="GitHub / Portfolio" class="rb-input" data-field="personal.github">
+          </div>
+        </div>
+
+        <!-- Professional Summary -->
+        <div class="rb-section" data-step="2">
+          <div style="display:flex; justify-content:space-between; align-items:center">
+            <h4 class="rb-section-title" data-toggle="rb-summary">Professional Summary</h4>
+            <button type="button" class="rb-improve-btn" data-improve="summary">Improve with TalentLens</button>
+          </div>
+          <div class="rb-section-body" id="rb-summary">
+            <textarea id="rb-summary-text" class="rb-textarea" rows="4" placeholder="Write a brief professional summary..." data-field="summary"></textarea>
+            <div id="rb-summary-suggestion" class="rb-suggestion" style="display:none">
+              <div class="rb-suggestion-text"></div>
+              <div class="rb-suggestion-actions">
+                <button type="button" class="btn btn-primary btn-sm rb-use-suggestion">Use Suggestion</button>
+                <button type="button" class="btn btn-outline btn-sm rb-keep-original">Keep Original</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Experience -->
+        <div class="rb-section" data-step="3">
+          <div style="display:flex; justify-content:space-between; align-items:center">
+            <h4 class="rb-section-title" data-toggle="rb-experience">Work Experience</h4>
+            <button type="button" class="rb-add-btn" data-add="experience">+ Add Entry</button>
+          </div>
+          <div class="rb-section-body" id="rb-experience"></div>
+        </div>
+
+        <!-- Projects -->
+        <div class="rb-section" data-step="3">
+          <div style="display:flex; justify-content:space-between; align-items:center">
+            <h4 class="rb-section-title" data-toggle="rb-projects">Projects</h4>
+            <button type="button" class="rb-add-btn" data-add="projects">+ Add Entry</button>
+          </div>
+          <div class="rb-section-body" id="rb-projects"></div>
+        </div>
+
+        <!-- Skills -->
+        <div class="rb-section" data-step="4">
+          <h4 class="rb-section-title" data-toggle="rb-skills">Skills</h4>
+          <div class="rb-section-body" id="rb-skills">
+            <div id="rb-skills-list" class="rb-skills-container"></div>
+            <div class="rb-skill-add-row">
+              <input type="text" id="rb-new-skill" placeholder="Add a skill..." class="rb-input" style="flex:1">
+              <button type="button" class="btn btn-outline btn-sm" id="rb-add-skill-btn">Add</button>
+            </div>
+            {% if analysis and analysis.missing_skills %}
+            <div style="margin-top:0.75rem">
+              <div style="font-size:0.8rem; font-weight:600; color:var(--muted); margin-bottom:0.5rem">SKILL GAPS FROM ANALYSIS</div>
+              {% for skill in analysis.missing_skills[:8] %}
+              <div class="rb-gap-alert" data-skill="{{ skill.name }}">
+                <div>
+                  <span style="color:var(--warning); font-weight:600">&#9888; {{ skill.name }}</span>
+                  <span style="font-size:0.8rem; color:var(--muted)"> &mdash; Not detected in your resume</span>
+                </div>
+                <div style="display:flex; gap:0.35rem; margin-top:0.35rem">
+                  <button type="button" class="btn btn-outline btn-sm rb-gap-add" data-skill="{{ skill.name }}">Add to Skills</button>
+                  <a href="{{ url_for('resource_page', skill=skill.name) }}" class="btn btn-outline btn-sm" target="_blank">Learn Skill</a>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Education -->
+        <div class="rb-section" data-step="5">
+          <div style="display:flex; justify-content:space-between; align-items:center">
+            <h4 class="rb-section-title" data-toggle="rb-education">Education</h4>
+            <button type="button" class="rb-add-btn" data-add="education">+ Add Entry</button>
+          </div>
+          <div class="rb-section-body" id="rb-education"></div>
+        </div>
+
+        <!-- Certifications -->
+        <div class="rb-section" data-step="6">
+          <div style="display:flex; justify-content:space-between; align-items:center">
+            <h4 class="rb-section-title" data-toggle="rb-certifications">Certifications</h4>
+            <button type="button" class="rb-add-btn" data-add="certifications">+ Add Entry</button>
+          </div>
+          <div class="rb-section-body" id="rb-certifications"></div>
+        </div>
+
+        <!-- Achievements -->
+        <div class="rb-section" data-step="6">
+          <div style="display:flex; justify-content:space-between; align-items:center">
+            <h4 class="rb-section-title" data-toggle="rb-achievements">Achievements</h4>
+            <button type="button" class="rb-add-btn" data-add="achievements">+ Add Entry</button>
+          </div>
+          <div class="rb-section-body" id="rb-achievements"></div>
+        </div>
+
+        <!-- Languages -->
+        <div class="rb-section" data-step="6">
+          <div style="display:flex; justify-content:space-between; align-items:center">
+            <h4 class="rb-section-title" data-toggle="rb-languages">Languages</h4>
+            <button type="button" class="rb-add-btn" data-add="languages">+ Add Entry</button>
+          </div>
+          <div class="rb-section-body" id="rb-languages"></div>
+        </div>
+
+        <!-- Links -->
+        <div class="rb-section" data-step="6">
+          <div style="display:flex; justify-content:space-between; align-items:center">
+            <h4 class="rb-section-title" data-toggle="rb-links">Links &amp; Portfolios</h4>
+            <button type="button" class="rb-add-btn" data-add="links">+ Add Entry</button>
+          </div>
+          <div class="rb-section-body" id="rb-links"></div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: LIVE PREVIEW -->
+      <div style="position:sticky; top:80px">
+        <div class="card" style="padding:0; overflow:hidden">
+          <div style="padding:0.75rem 1rem; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center">
+            <span style="font-size:0.85rem; font-weight:600">Live Preview</span>
+            <span id="previewTemplateLabel" style="font-size:0.75rem; color:var(--muted)">Modern</span>
+          </div>
+          <div class="rb-preview-wrap"><div id="previewPanel" class="rb-preview-panel"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* ---- Resume Builder Styles ---- */
+.rb-landing-card:hover { transform:translateY(-2px); box-shadow:0 8px 25px rgba(0,0,0,0.1) }
+.rb-section { margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:1rem }
+.rb-section:last-child { border-bottom:none }
+.rb-section-title {
+  font-size:0.95rem; font-weight:600; margin:0; padding:0.5rem 0; cursor:pointer;
+  display:flex; align-items:center; gap:0.5rem; user-select:none;
+}
+.rb-section-title::before { content:"\25B8"; font-size:0.7rem; color:var(--muted); transition:transform 0.2s }
+.rb-section-title.open::before { transform:rotate(90deg) }
+.rb-section-body { padding-top:0.5rem }
+.rb-input {
+  width:100%; padding:0.5rem 0.75rem; border-radius:6px; border:1px solid var(--border);
+  background:var(--surface-2); color:var(--text); font-size:0.9rem; margin-bottom:0.5rem;
+  font-family:inherit;
+}
+.rb-input:focus, .rb-textarea:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 2px rgba(37,99,235,0.15) }
+.rb-textarea {
+  width:100%; padding:0.5rem 0.75rem; border-radius:6px; border:1px solid var(--border);
+  background:var(--surface-2); color:var(--text); font-size:0.9rem; resize:vertical;
+  font-family:inherit; line-height:1.5;
+}
+.rb-entry-card {
+  background:var(--surface-2); border-radius:8px; padding:1rem; margin-bottom:0.75rem;
+  border:1px solid var(--border); position:relative;
+}
+.rb-entry-card .rb-remove {
+  position:absolute; top:0.5rem; right:0.5rem; background:none; border:none;
+  color:var(--muted); cursor:pointer; font-size:1rem; padding:0.15rem 0.35rem; border-radius:4px;
+}
+.rb-entry-card .rb-remove:hover { color:var(--danger); background:rgba(239,68,68,0.1) }
+.rb-add-btn {
+  background:none; border:none; color:var(--primary); font-size:0.8rem; font-weight:600;
+  cursor:pointer; padding:0.25rem 0.5rem; border-radius:4px;
+}
+.rb-add-btn:hover { background:rgba(37,99,235,0.1) }
+.rb-skills-container { display:flex; flex-wrap:wrap; gap:0.4rem; margin-bottom:0.5rem }
+.rb-skill-chip {
+  display:inline-flex; align-items:center; gap:0.35rem; padding:0.3rem 0.6rem;
+  border-radius:20px; font-size:0.8rem; font-weight:500; background:var(--surface-2);
+  border:1px solid var(--border); color:var(--text);
+}
+.rb-skill-chip .rb-skill-x {
+  background:none; border:none; color:var(--muted); cursor:pointer; font-size:0.7rem;
+  padding:0; line-height:1;
+}
+.rb-skill-chip .rb-skill-x:hover { color:var(--danger) }
+.rb-skill-add-row { display:flex; gap:0.5rem; align-items:center }
+.rb-improve-btn {
+  background:none; border:none; color:var(--primary); font-size:0.75rem; font-weight:600;
+  cursor:pointer; padding:0.2rem 0.5rem; border-radius:4px; white-space:nowrap;
+}
+.rb-improve-btn:hover { background:rgba(37,99,235,0.1) }
+.rb-suggestion {
+  background:var(--surface-2); border:1px solid var(--primary); border-radius:8px;
+  padding:0.75rem; margin-top:0.5rem;
+}
+.rb-suggestion-text { font-size:0.88rem; color:var(--text); line-height:1.5; margin-bottom:0.5rem }
+.rb-suggestion-actions { display:flex; gap:0.5rem }
+.rb-gap-alert {
+  padding:0.5rem 0.75rem; border-radius:6px; border:1px solid var(--warning);
+  background:rgba(245,158,11,0.05); margin-bottom:0.5rem;
+}
+/* Progress bar */
+.rb-progress-step {
+  display:flex; align-items:center; gap:0.3rem; padding:0.35rem 0.6rem;
+  border-radius:20px; white-space:nowrap; color:var(--muted); font-size:0.78rem; font-weight:500;
+  transition:all 0.2s;
+}
+.rb-progress-step.active { background:var(--primary); color:#fff }
+.rb-progress-step.done { background:rgba(34,197,94,0.15); color:#16a34a }
+.rb-progress-num {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:1.2rem; height:1.2rem; border-radius:50%; font-size:0.65rem; font-weight:700;
+  background:rgba(0,0,0,0.08);
+}
+.rb-progress-step.active .rb-progress-num { background:rgba(255,255,255,0.3) }
+.rb-progress-line {
+  width:1.2rem; height:1px; background:var(--border); flex-shrink:0;
+}
+/* Saved resume cards */
+.rb-saved-card {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:0.75rem 1rem; border:1px solid var(--border); border-radius:8px;
+  margin-bottom:0.5rem; cursor:pointer; transition:background 0.15s;
+}
+.rb-saved-card:hover { background:var(--surface-2) }
+/* Preview Panel */
+.rb-preview-wrap {
+  background:#e8e8e8; border-radius:6px; padding:1.25rem;
+  max-height:calc(100vh - 250px); overflow-y:auto;
+}
+.rb-preview-panel {
+  width:100%; max-width:595px; margin:0 auto;
+  aspect-ratio:210/297; padding:6% 7%; box-sizing:border-box;
+  background:#fff; color:#1a1a1a; font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size:0.72rem; line-height:1.45; box-shadow:0 2px 12px rgba(0,0,0,0.12);
+  overflow:hidden; position:relative;
+}
+.rb-preview-panel .rp-name {
+  font-size:1.35rem; font-weight:700; text-align:center; margin-bottom:0.15rem;
+  letter-spacing:0.3px; color:#111;
+}
+.rb-preview-panel .rp-title {
+  text-align:center; font-size:0.72rem; margin-bottom:0.2rem; color:#2563eb;
+}
+.rb-preview-panel.professional .rp-title { color:#374151 }
+.rb-preview-panel.executive .rp-title { color:#1e1e1e }
+.rb-preview-panel .rp-contact {
+  text-align:center; font-size:0.62rem; color:#666; margin-bottom:0.4rem;
+  padding-bottom:0.4rem; border-bottom:1px solid #ddd;
+}
+.rb-preview-panel .rp-section-title {
+  font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.8px;
+  border-bottom:1.5px solid #2563eb; padding-bottom:0.15rem;
+  margin:0.55rem 0 0.3rem; color:#1a1a1a;
+}
+.rb-preview-panel.professional .rp-section-title { border-bottom-color:#374151 }
+.rb-preview-panel.executive .rp-section-title { border-bottom-color:#1e1e1e; font-size:0.75rem }
+.rb-preview-panel .rp-text { margin-bottom:0.3rem; font-size:0.68rem; line-height:1.4 }
+.rb-preview-panel .rp-exp-title { font-weight:700; font-size:0.72rem; margin-top:0.2rem }
+.rb-preview-panel .rp-exp-meta { font-style:italic; font-size:0.62rem; color:#666; margin-bottom:0.15rem }
+.rb-preview-panel .rp-bullet {
+  padding-left:0.8rem; position:relative; margin-bottom:0.1rem; font-size:0.68rem;
+  line-height:1.35;
+}
+.rb-preview-panel .rp-bullet::before { content:"\2022"; position:absolute; left:0.1rem; color:#2563eb; font-size:0.6rem }
+.rb-preview-panel.professional .rp-bullet::before { color:#374151 }
+.rb-preview-panel.executive .rp-bullet::before { color:#1e1e1e }
+.rb-preview-panel .rp-skills { font-size:0.68rem; line-height:1.4 }
+/* Responsive */
+@media (max-width:900px) {
+  .rb-landing-card { grid-column:span 1 !important }
+  div[style*="grid-template-columns:1fr 1fr"] { grid-template-columns:1fr !important }
+  .rb-preview-panel { max-height:none; aspect-ratio:auto; min-height:500px }
+  .rb-preview-wrap { max-height:none }
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  "use strict";
+
+  var TOKEN = "{{ token or '' }}";
+  var analysis = {{ analysis | tojson if analysis else 'null' }};
+  var serverResumeData = {{ resume_data | tojson if resume_data else 'null' }};
+  var savedResumeId = {{ loaded_resume_id | tojson if loaded_resume_id else 'null' }};
+  var savedTemplateVal = {{ saved_template | tojson if saved_template else 'null' }};
+  var savedResumesList = {{ saved_resumes_list | tojson if saved_resumes_list else '[]' }};
+
+  // ---- Helpers ----
+  function setVal(id, val) {
+    var el = document.getElementById(id);
+    if (el) el.value = val || "";
+  }
+  function esc(s) { var d = document.createElement("div"); d.textContent = s || ""; return d.innerHTML; }
+  function esc2(s) { return String(s || "").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  // ---- Landing Page Logic ----
+  var landingEl = document.getElementById("rb-landing");
+  var editorEl = document.getElementById("rb-editor");
+  var hasData = !!analysis || !!savedResumeId;
+
+  if (landingEl && !hasData) {
+    // Show landing page
+    var createBtn = document.getElementById("rb-create-new-btn");
+    var quickBtn = document.getElementById("rb-quick-edit-btn");
+    var savedSection = document.getElementById("rb-saved-list-section");
+    var savedList = document.getElementById("rb-saved-list");
+    var savedEmpty = document.getElementById("rb-saved-empty");
+    var savedEmptyCreate = document.getElementById("rb-saved-empty-create");
+
+    if (createBtn) {
+      createBtn.addEventListener("click", function() {
+        landingEl.style.display = "none";
+        editorEl.style.display = "";
+        initEditor(true);
+      });
+    }
+
+    if (savedEmptyCreate) {
+      savedEmptyCreate.addEventListener("click", function() {
+        landingEl.style.display = "none";
+        editorEl.style.display = "";
+        initEditor(true);
+      });
+    }
+
+    if (quickBtn) {
+      quickBtn.addEventListener("click", function() {
+        if (savedResumesList.length === 0) {
+          savedSection.style.display = "";
+          savedList.style.display = "none";
+          savedEmpty.style.display = "";
+        } else {
+          savedSection.style.display = "";
+          savedEmpty.style.display = "none";
+          savedList.style.display = "";
+          renderSavedList();
+        }
+      });
+    }
+
+    function renderSavedList() {
+      savedList.innerHTML = "";
+      savedResumesList.forEach(function(r) {
+        var card = document.createElement("div");
+        card.className = "rb-saved-card";
+        var date = new Date(r.updated_at * 1000).toLocaleDateString();
+        card.innerHTML = '<div><div style="font-weight:600; font-size:0.9rem">' + esc(r.name || "Untitled") + '</div>' +
+          '<div style="font-size:0.78rem; color:var(--muted)">Template: ' + esc(r.template) + ' &middot; ' + date + '</div></div>' +
+          '<div style="display:flex; gap:0.4rem">' +
+          '<button type="button" class="btn btn-primary btn-sm rb-load-saved" data-id="' + r.id + '">Edit</button>' +
+          '<button type="button" class="btn btn-outline btn-sm rb-delete-saved" data-id="' + r.id + '">&#128465;</button></div>';
+        savedList.appendChild(card);
+      });
+
+      savedList.querySelectorAll(".rb-load-saved").forEach(function(btn) {
+        btn.addEventListener("click", function(e) {
+          e.stopPropagation();
+          window.location.href = "/resume-builder?resume_id=" + btn.dataset.id;
+        });
+      });
+
+      savedList.querySelectorAll(".rb-delete-saved").forEach(function(btn) {
+        btn.addEventListener("click", function(e) {
+          e.stopPropagation();
+          if (!confirm("Delete this resume?")) return;
+          fetch("/api/resume-builder/delete", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({resume_id: btn.dataset.id})
+          }).then(function(r) { return r.json(); }).then(function(d) {
+            if (d.ok) {
+              savedResumesList = savedResumesList.filter(function(r) { return r.id !== btn.dataset.id; });
+              renderSavedList();
+              if (savedResumesList.length === 0) {
+                savedList.style.display = "none";
+                savedEmpty.style.display = "";
+              }
+            }
+          });
+        });
+      });
+    }
+  }
+
+  // ---- Choice Screen Logic ----
+  var choiceEl = document.getElementById("rb-choice");
+  var hasAnalysis = !!analysis && !savedResumeId;
+
+  if (choiceEl && hasAnalysis) {
+    var choiceNewBtn = document.getElementById("rb-choice-new-btn");
+    var choiceAnalysisBtn = document.getElementById("rb-choice-analysis-btn");
+    var choiceNewCard = document.getElementById("rb-choice-new-card");
+    var choiceAnalysisCard = document.getElementById("rb-choice-analysis-card");
+
+    function showEditor(fromScratch) {
+      choiceEl.style.display = "none";
+      editorEl.style.display = "";
+      initEditor(fromScratch);
+    }
+
+    if (choiceNewBtn) choiceNewBtn.addEventListener("click", function() { showEditor(true); });
+    if (choiceNewCard) choiceNewCard.addEventListener("click", function(e) {
+      if (e.target.tagName !== "BUTTON") showEditor(true);
+    });
+    if (choiceAnalysisBtn) choiceAnalysisBtn.addEventListener("click", function() { showEditor(false); });
+    if (choiceAnalysisCard) choiceAnalysisCard.addEventListener("click", function(e) {
+      if (e.target.tagName !== "BUTTON") showEditor(false);
+    });
+  }
+
+  // ---- State ----
+  var resumeData = null;
+  var originalData = null;
+  var currentTemplate = "modern";
+  var editorInitialized = false;
+
+  if (savedTemplateVal) currentTemplate = savedTemplateVal;
+
+  function initEditor(fromScratch) {
+    if (editorInitialized) return;
+    editorInitialized = true;
+
+    if (fromScratch) {
+      resumeData = {
+        personal: {name:"", email:"", phone:"", linkedin:"", github:""},
+        summary: "",
+        experience: [],
+        projects: [],
+        skills: [],
+        education: [],
+        certifications: [],
+        achievements: [],
+        languages: [],
+        links: []
+      };
+    } else {
+      resumeData = buildInitialResume(analysis);
+    }
+    originalData = JSON.parse(JSON.stringify(resumeData));
+
+    // Show back button when editor was opened from landing or choice screen
+    var backBtn = document.getElementById("rb-back-btn");
+    if (backBtn && !savedResumeId) {
+      backBtn.style.display = "";
+      backBtn.addEventListener("click", function() {
+        window.location.href = "/resume-builder";
+      });
+    }
+
+    initPersonalEditor();
+    initSummaryEditor();
+    ["experience","projects","education","certifications","achievements","languages","links"].forEach(renderListSection);
+    renderSkills();
+    renderPreview();
+    bindAddButtons();
+    bindProgressSteps();
+
+    // Set template selector
+    var ts = document.getElementById("templateSelect");
+    if (ts) {
+      ts.value = currentTemplate;
+      var pl = document.getElementById("previewTemplateLabel");
+      if (pl) pl.textContent = ts.options[ts.selectedIndex].text;
+    }
+  }
+
+  // If we have a saved resume loaded (resume_id), init immediately
+  // If analysis exists but no saved resume, the choice screen handles init
+  if (savedResumeId) {
+    if (editorEl) editorEl.style.display = "";
+    if (landingEl) landingEl.style.display = "none";
+    var choiceElInit = document.getElementById("rb-choice");
+    if (choiceElInit) choiceElInit.style.display = "none";
+    initEditor(false);
+  }
+
+  // ---- Build initial resume from analysis ----
+  function buildInitialResume(a) {
+    if (serverResumeData && serverResumeData.personal) {
+      var skills = (a.matched_skills || []).map(function(s) { return {name: s.name, category: s.category || ""}; });
+      (a.resume_skills || []).forEach(function(s) {
+        if (!skills.some(function(sk) { return sk.name.toLowerCase() === s.name.toLowerCase(); })) {
+          skills.push({name: s.name, category: s.category || ""});
+        }
+      });
+      var exp = (serverResumeData.experience || []).map(function(e) {
+        if (typeof e === "string") return {title: e, company: "", dates: "", description: "", bullets: []};
+        return {title: e.title || "", company: e.company || "", dates: e.dates || "", description: e.description || "", bullets: e.bullets || []};
+      });
+      var projs = (serverResumeData.projects || []).map(function(p) {
+        if (typeof p === "string") return {name: p, description: ""};
+        return {name: p.name || "", description: p.description || ""};
+      });
+      var edu = (serverResumeData.education || []).map(function(e) {
+        if (typeof e === "string") return e;
+        return e.text || e.degree || e.name || JSON.stringify(e);
+      });
+      var certs = (serverResumeData.certifications || []).map(function(c) {
+        if (typeof c === "string") return c;
+        return c.name || c.text || JSON.stringify(c);
+      });
+      var achs = (serverResumeData.achievements || []).map(function(a) {
+        if (typeof a === "string") return a;
+        return a.text || a.name || JSON.stringify(a);
+      });
+      return {
+        personal: serverResumeData.personal || {},
+        summary: serverResumeData.summary || "",
+        experience: exp,
+        projects: projs,
+        skills: skills,
+        education: edu,
+        certifications: certs,
+        achievements: achs,
+        languages: serverResumeData.languages || [],
+        links: serverResumeData.links || [],
+        additional: []
+      };
+    }
+    // Fallback
+    var resumeText = a.resume_text_excerpt || "";
+    var sections = parseResumeText(resumeText);
+    var skills = (a.matched_skills || []).map(function(s) { return {name: s.name, category: s.category || ""}; });
+    (a.resume_skills || []).forEach(function(s) {
+      if (!skills.some(function(sk) { return sk.name.toLowerCase() === s.name.toLowerCase(); })) {
+        skills.push({name: s.name, category: s.category || ""});
+      }
+    });
+    return {
+      personal: sections.personal || {},
+      summary: sections.summary || "",
+      experience: sections.experience || [],
+      projects: sections.projects || [],
+      skills: skills,
+      education: sections.education || [],
+      certifications: sections.certifications || [],
+      achievements: sections.achievements || [],
+      languages: [],
+      links: [],
+      additional: []
+    };
+  }
+
+  function parseResumeText(text) {
+    var lines = text.split("\n").map(function(l) { return l.trim(); }).filter(Boolean);
+    var result = { personal: {}, summary: "", experience: [], projects: [], education: [], certifications: [], achievements: [], additional: [] };
+    if (!lines.length) return result;
+    if (lines.length <= 3 && text.length > 100) {
+      var headerWords = ["summary","experience","skills","education","projects","certifications","achievements"];
+      for (var h = 0; h < headerWords.length; h++) {
+        var re = new RegExp("\\b" + headerWords[h] + "\\b", "gi");
+        text = text.replace(re, "\n" + headerWords[h].charAt(0).toUpperCase() + headerWords[h].slice(1) + "\n");
+      }
+      lines = text.split("\n").map(function(l) { return l.trim(); }).filter(Boolean);
+    }
+    result.personal.name = lines[0];
+    for (var i = 1; i < Math.min(10, lines.length); i++) {
+      var l = lines[i].toLowerCase();
+      if (lines[i].indexOf("@") > -1 && !result.personal.email) result.personal.email = lines[i];
+      else if ((l.indexOf("phone") > -1 || l.indexOf("+") === 0) && !result.personal.phone) result.personal.phone = lines[i];
+      else if (l.indexOf("linkedin") > -1 && !result.personal.linkedin) result.personal.linkedin = lines[i];
+    }
+    var sectionMap = { summary: ["summary","objective","profile"], experience: ["experience","work experience","employment"], projects: ["projects"], skills: ["skills","technical skills"], education: ["education","academic"], certifications: ["certifications","certificates"], achievements: ["achievements","awards"] };
+    var current = null, content = [];
+    for (var j = 1; j < lines.length; j++) {
+      var low = lines[j].toLowerCase().replace(/:$/, "");
+      var found = null;
+      for (var key in sectionMap) {
+        if (sectionMap[key].indexOf(low) > -1) { found = key; break; }
+      }
+      if (found) {
+        if (current && content.length) saveSection(result, current, content);
+        current = found; content = [];
+      } else if (current) {
+        content.push(lines[j]);
+      }
+    }
+    if (current && content.length) saveSection(result, current, content);
+    return result;
+  }
+
+  function saveSection(result, name, lines) {
+    if (name === "summary") result.summary = lines.join(" ");
+    else if (name === "skills") result.skills = lines.map(function(l) { return {name: l.replace(/^[\u2022\-]\s*/, ""), category: ""}; });
+    else result[name] = lines.join(" | ");
+  }
+
+  // ---- Live Preview ----
+  function renderPreview() {
+    var p = document.getElementById("previewPanel");
+    if (!p || !resumeData) return;
+    var d = resumeData;
+    var html = "";
+    html += '<div class="rp-name">' + esc(d.personal.name || "Your Name") + "</div>";
+    var jobTitle = "";
+    if (analysis && analysis.job_skills && analysis.job_skills[0]) jobTitle = analysis.job_skills[0].name;
+    if (jobTitle && jobTitle.toLowerCase() !== "resume") {
+      html += '<div class="rp-title">' + esc(jobTitle) + "</div>";
+    }
+    var contact = [d.personal.email, d.personal.phone, d.personal.linkedin, d.personal.github].filter(Boolean);
+    if (contact.length) html += '<div class="rp-contact">' + esc(contact.join("  |  ")) + "</div>";
+    if (d.summary) {
+      html += '<div class="rp-section-title">Professional Summary</div>';
+      html += '<div class="rp-text">' + esc(d.summary) + "</div>";
+    }
+    if (d.experience && d.experience.length) {
+      html += '<div class="rp-section-title">Experience</div>';
+      d.experience.forEach(function(e) {
+        if (typeof e === "string") { html += '<div class="rp-bullet">' + esc(e) + "</div>"; return; }
+        if (e.title || e.company) html += '<div class="rp-exp-title">' + esc(e.title || "") + (e.company ? " \u2014 " + esc(e.company) : "") + "</div>";
+        if (e.dates) html += '<div class="rp-exp-meta">' + esc(e.dates) + "</div>";
+        if (e.description) html += '<div class="rp-text">' + esc(e.description) + "</div>";
+        (e.bullets || []).forEach(function(b) { html += '<div class="rp-bullet">' + esc(b) + "</div>"; });
+      });
+    }
+    if (d.projects && d.projects.length) {
+      html += '<div class="rp-section-title">Projects</div>';
+      d.projects.forEach(function(pr) {
+        if (typeof pr === "string") { html += '<div class="rp-bullet">' + esc(pr) + "</div>"; return; }
+        if (pr.name) html += '<div class="rp-exp-title">' + esc(pr.name) + "</div>";
+        if (pr.description) html += '<div class="rp-text">' + esc(pr.description) + "</div>";
+      });
+    }
+    if (d.skills && d.skills.length) {
+      html += '<div class="rp-section-title">Skills</div>';
+      html += '<div class="rp-skills">' + d.skills.map(function(s) { return esc(s.name); }).join(", ") + "</div>";
+    }
+    if (d.education && d.education.length) {
+      html += '<div class="rp-section-title">Education</div>';
+      d.education.forEach(function(e) { html += '<div class="rp-text">' + esc(typeof e === "string" ? e : e.text || e.degree || "") + "</div>"; });
+    }
+    if (d.certifications && d.certifications.length) {
+      html += '<div class="rp-section-title">Certifications</div>';
+      d.certifications.forEach(function(c) { html += '<div class="rp-bullet">' + esc(typeof c === "string" ? c : c.name || "") + "</div>"; });
+    }
+    if (d.achievements && d.achievements.length) {
+      html += '<div class="rp-section-title">Achievements</div>';
+      d.achievements.forEach(function(a) { html += '<div class="rp-bullet">' + esc(typeof a === "string" ? a : a.text || "") + "</div>"; });
+    }
+    if (d.languages && d.languages.length) {
+      html += '<div class="rp-section-title">Languages</div>';
+      html += '<div class="rp-skills">' + d.languages.map(function(l) { return esc(typeof l === "string" ? l : l.name || ""); }).join(", ") + "</div>";
+    }
+    if (d.links && d.links.length) {
+      html += '<div class="rp-section-title">Links</div>';
+      d.links.forEach(function(lk) { html += '<div class="rp-bullet">' + esc(typeof lk === "string" ? lk : lk.url || lk.name || "") + "</div>"; });
+    }
+
+    p.className = "rb-preview-panel " + currentTemplate;
+    p.innerHTML = html;
+  }
+
+  // ---- Editor: Personal Info ----
+  function initPersonalEditor() {
+    var p = resumeData.personal || {};
+    setVal("rb-name", p.name);
+    setVal("rb-email", p.email);
+    setVal("rb-phone", p.phone);
+    setVal("rb-linkedin", p.linkedin);
+    setVal("rb-github", p.github);
+    ["rb-name","rb-email","rb-phone","rb-linkedin","rb-github"].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener("input", function() {
+        var field = id.replace("rb-", "");
+        resumeData.personal[field] = el.value;
+        renderPreview();
+        updateProgress();
+      });
+    });
+  }
+
+  // ---- Editor: Summary ----
+  function initSummaryEditor() {
+    var el = document.getElementById("rb-summary-text");
+    if (el) {
+      el.value = resumeData.summary || "";
+      el.addEventListener("input", function() { resumeData.summary = el.value; renderPreview(); updateProgress(); });
+    }
+  }
+
+  // ---- Editor: List sections ----
+  function renderListSection(section) {
+    var container = document.getElementById("rb-" + section);
+    if (!container) return;
+    var items = resumeData[section] || [];
+    var html = "";
+    items.forEach(function(item, idx) {
+      if (section === "experience") {
+        var e = typeof item === "string" ? {title: item, company: "", dates: "", description: "", bullets: []} : item;
+        html += '<div class="rb-entry-card">';
+        html += '<button type="button" class="rb-remove" data-section="' + section + '" data-idx="' + idx + '">&times;</button>';
+        html += '<input type="text" class="rb-input" placeholder="Job Title" value="' + esc2(e.title || "") + '" data-section="' + section + '" data-idx="' + idx + '" data-subfield="title">';
+        html += '<input type="text" class="rb-input" placeholder="Company" value="' + esc2(e.company || "") + '" data-section="' + section + '" data-idx="' + idx + '" data-subfield="company">';
+        html += '<input type="text" class="rb-input" placeholder="Dates (e.g., 2020 \u2014 2024)" value="' + esc2(e.dates || "") + '" data-section="' + section + '" data-idx="' + idx + '" data-subfield="dates">';
+        html += '<textarea class="rb-textarea" rows="2" placeholder="Description or responsibilities..." data-section="' + section + '" data-idx="' + idx + '" data-subfield="description">' + esc2(e.description || "") + '</textarea>';
+        html += '</div>';
+      } else if (section === "projects") {
+        var pr = typeof item === "string" ? {name: item, description: ""} : item;
+        html += '<div class="rb-entry-card">';
+        html += '<button type="button" class="rb-remove" data-section="' + section + '" data-idx="' + idx + '">&times;</button>';
+        html += '<input type="text" class="rb-input" placeholder="Project Name" value="' + esc2(pr.name || "") + '" data-section="' + section + '" data-idx="' + idx + '" data-subfield="name">';
+        html += '<textarea class="rb-textarea" rows="2" placeholder="Project description..." data-section="' + section + '" data-idx="' + idx + '" data-subfield="description">' + esc2(pr.description || "") + '</textarea>';
+        html += '</div>';
+      } else {
+        var text = typeof item === "string" ? item : (item.text || item.name || item.url || JSON.stringify(item));
+        html += '<div class="rb-entry-card">';
+        html += '<button type="button" class="rb-remove" data-section="' + section + '" data-idx="' + idx + '">&times;</button>';
+        html += '<input type="text" class="rb-input" placeholder="' + section.charAt(0).toUpperCase() + section.slice(1) + '" value="' + esc2(text) + '" data-section="' + section + '" data-idx="' + idx + '" data-subfield="text">';
+        html += '</div>';
+      }
+    });
+    if (!items.length) html = '<div style="color:var(--muted); font-size:0.85rem; padding:0.5rem 0">No entries yet.</div>';
+    container.innerHTML = html;
+    bindListEvents(container, section);
+  }
+
+  function bindListEvents(container, section) {
+    container.querySelectorAll(".rb-remove").forEach(function(btn) {
+      btn.addEventListener("click", function() {
+        var idx = parseInt(btn.dataset.idx);
+        resumeData[section].splice(idx, 1);
+        renderListSection(section);
+        renderPreview();
+        updateProgress();
+      });
+    });
+    container.querySelectorAll("input, textarea").forEach(function(el) {
+      if (el.classList.contains("rb-remove")) return;
+      el.addEventListener("input", function() {
+        var idx = parseInt(el.dataset.idx);
+        var subfield = el.dataset.subfield;
+        var item = resumeData[section][idx];
+        if (typeof item === "string") {
+          resumeData[section][idx] = el.value;
+        } else {
+          item[subfield] = el.value;
+        }
+        renderPreview();
+      });
+    });
+  }
+
+  // ---- Editor: Skills ----
+  function renderSkills() {
+    var list = document.getElementById("rb-skills-list");
+    if (!list) return;
+    list.innerHTML = (resumeData.skills || []).map(function(s, i) {
+      return '<span class="rb-skill-chip">' + esc(s.name) + '<button type="button" class="rb-skill-x" data-idx="' + i + '">&times;</button></span>';
+    }).join("");
+    list.querySelectorAll(".rb-skill-x").forEach(function(btn) {
+      btn.addEventListener("click", function() {
+        resumeData.skills.splice(parseInt(btn.dataset.idx), 1);
+        renderSkills(); renderPreview(); updateProgress();
+      });
+    });
+  }
+
+  // ---- Add buttons ----
+  function bindAddButtons() {
+    document.querySelectorAll(".rb-add-btn").forEach(function(btn) {
+      btn.addEventListener("click", function() {
+        var section = btn.dataset.add;
+        if (section === "experience") resumeData.experience.push({title: "", company: "", dates: "", description: "", bullets: []});
+        else if (section === "projects") resumeData.projects.push({name: "", description: ""});
+        else if (!resumeData[section]) resumeData[section] = [];
+        else resumeData[section].push("");
+        renderListSection(section);
+        renderPreview();
+      });
+    });
+  }
+
+  document.addEventListener("click", function(e) {
+    if (e.target.classList.contains("rb-remove")) {
+      var section = e.target.dataset.section;
+      var idx = parseInt(e.target.dataset.idx);
+      resumeData[section].splice(idx, 1);
+      renderListSection(section);
+      renderPreview();
+    }
+  });
+
+  // ---- Add skill ----
+  var addSkillBtn = document.getElementById("rb-add-skill-btn");
+  var newSkillInput = document.getElementById("rb-new-skill");
+  if (addSkillBtn && newSkillInput) {
+    addSkillBtn.addEventListener("click", function() {
+      var name = newSkillInput.value.trim();
+      if (!name) return;
+      if (resumeData.skills.some(function(s) { return s.name.toLowerCase() === name.toLowerCase(); })) return;
+      resumeData.skills.push({name: name, category: ""});
+      newSkillInput.value = "";
+      renderSkills(); renderPreview(); updateProgress();
+    });
+    newSkillInput.addEventListener("keydown", function(e) {
+      if (e.key === "Enter") { e.preventDefault(); addSkillBtn.click(); }
+    });
+  }
+
+  // ---- Gap alert buttons ----
+  document.querySelectorAll(".rb-gap-add").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      var name = btn.dataset.skill;
+      if (!resumeData.skills.some(function(s) { return s.name.toLowerCase() === name.toLowerCase(); })) {
+        resumeData.skills.push({name: name, category: "", addedFromGap: true});
+        renderSkills(); renderPreview(); updateProgress();
+        btn.textContent = "Added \u2713";
+        btn.disabled = true;
+      }
+    });
+  });
+
+  // ---- Section collapse/expand ----
+  document.querySelectorAll(".rb-section-title[data-toggle]").forEach(function(title) {
+    title.addEventListener("click", function() {
+      var target = document.getElementById(title.dataset.toggle);
+      if (target) {
+        var visible = target.style.display !== "none";
+        target.style.display = visible ? "none" : "";
+        title.classList.toggle("open", !visible);
+      }
+    });
+    title.classList.add("open");
+  });
+
+  // ---- Progress indicator ----
+  function updateProgress() {
+    if (!resumeData) return;
+    var steps = [
+      {step:1, done: !!(resumeData.personal && resumeData.personal.name)},
+      {step:2, done: !!(resumeData.summary)},
+      {step:3, done: !!(resumeData.experience && resumeData.experience.length)},
+      {step:4, done: !!(resumeData.skills && resumeData.skills.length)},
+      {step:5, done: !!(resumeData.education && resumeData.education.length)},
+      {step:6, done: !!(resumeData.languages && resumeData.languages.length) || !!(resumeData.certifications && resumeData.certifications.length) || !!(resumeData.achievements && resumeData.achievements.length) || !!(resumeData.links && resumeData.links.length)},
+      {step:7, done: !!(resumeData.personal && resumeData.personal.name && resumeData.summary)}
+    ];
+    var activeStep = 1;
+    steps.forEach(function(s) { if (s.done) activeStep = s.step + 1; });
+    if (activeStep > 7) activeStep = 7;
+    document.querySelectorAll(".rb-progress-step").forEach(function(el) {
+      var s = parseInt(el.dataset.step);
+      el.classList.remove("active", "done");
+      if (s < activeStep) el.classList.add("done");
+      else if (s === activeStep) el.classList.add("active");
+    });
+  }
+
+  function bindProgressSteps() {
+    document.querySelectorAll(".rb-progress-step").forEach(function(el) {
+      el.style.cursor = "pointer";
+      el.addEventListener("click", function() {
+        var step = parseInt(el.dataset.step);
+        var section = document.querySelector('.rb-section[data-step="' + step + '"]');
+        if (section) {
+          var body = section.querySelector(".rb-section-body");
+          if (body) body.style.display = "";
+          var title = section.querySelector(".rb-section-title");
+          if (title) title.classList.add("open");
+          section.scrollIntoView({behavior: "smooth", block: "start"});
+        }
+      });
+    });
+    updateProgress();
+  }
+
+  // ---- Template selector ----
+  var templateSelect = document.getElementById("templateSelect");
+  var previewLabel = document.getElementById("previewTemplateLabel");
+  if (templateSelect) {
+    templateSelect.addEventListener("change", function() {
+      currentTemplate = templateSelect.value;
+      if (previewLabel) previewLabel.textContent = templateSelect.options[templateSelect.selectedIndex].text;
+      renderPreview();
+    });
+  }
+
+  // ---- AI Summary Improvement ----
+  var improveBtn = document.querySelector('[data-improve="summary"]');
+  if (improveBtn) {
+    improveBtn.addEventListener("click", function() {
+      var current = resumeData.summary || "";
+      if (!current || current.length < 10) {
+        alert("Please write a summary first before improving it.");
+        return;
+      }
+      improveBtn.disabled = true;
+      improveBtn.textContent = "Improving...";
+      var box = document.getElementById("rb-summary-suggestion");
+      fetch("/api/resume-builder/improve-summary", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+          text: current,
+          source_token: TOKEN || "",
+          resume_data: {
+            personal: resumeData.personal || {},
+            summary: resumeData.summary || "",
+            experience: resumeData.experience || [],
+            projects: resumeData.projects || [],
+            skills: resumeData.skills || [],
+            education: resumeData.education || [],
+            certifications: resumeData.certifications || [],
+            achievements: resumeData.achievements || [],
+            languages: resumeData.languages || [],
+            links: resumeData.links || []
+          },
+          job_title: (analysis && analysis.job_skills && analysis.job_skills[0]) ? analysis.job_skills[0].name : "",
+          job_description: (analysis && analysis.job_text) ? analysis.job_text : ""
+        })
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        improveBtn.disabled = false;
+        improveBtn.textContent = "Improve with TalentLens";
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+        var suggestion = data.improved || current;
+        // Safety check: if suggestion is identical to original, show warning
+        var normalizedOrig = current.toLowerCase().replace(/[^a-z0-9\s]/g, "").replace(/\s+/g, " ").trim();
+        var normalizedSugg = suggestion.toLowerCase().replace(/[^a-z0-9\s]/g, "").replace(/\s+/g, " ").trim();
+        if (normalizedOrig === normalizedSugg) {
+          alert("The summary is already well-written. Try adding more details about your skills and experience to improve it.");
+          return;
+        }
+        if (box) {
+          box.style.display = "block";
+          box.querySelector(".rb-suggestion-text").textContent = suggestion;
+          box.querySelector(".rb-use-suggestion").onclick = function() {
+            resumeData.summary = suggestion;
+            var el = document.getElementById("rb-summary-text");
+            if (el) el.value = suggestion;
+            box.style.display = "none";
+            renderPreview(); updateProgress();
+          };
+          box.querySelector(".rb-keep-original").onclick = function() { box.style.display = "none"; };
+        }
+      })
+      .catch(function(err) {
+        improveBtn.disabled = false;
+        improveBtn.textContent = "Improve with TalentLens";
+        alert("Unable to improve summary. Please try again.");
+      });
+    });
+  }
+
+  // ---- Recalculate ATS ----
+  var recalcBtn = document.getElementById("recalcBtn");
+  if (recalcBtn) {
+    recalcBtn.addEventListener("click", function() {
+      recalcBtn.disabled = true;
+      recalcBtn.textContent = "Recalculating...";
+      fetch("/api/resume-builder/recalculate", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({resume_data: resumeData, source_token: TOKEN})
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        recalcBtn.disabled = false;
+        recalcBtn.textContent = "Recalculate ATS Score";
+        if (data.error) { alert(data.error); return; }
+        var scoreEl = document.getElementById("atsScoreDisplay");
+        if (scoreEl) scoreEl.textContent = data.overall_score + "%";
+        var origBox = document.getElementById("atsOriginalScore");
+        if (origBox) {
+          origBox.style.display = "inline";
+          document.getElementById("atsOrigVal").textContent = analysis.overall_score + "%";
+          document.getElementById("atsNewVal").textContent = data.overall_score + "%";
+          var diff = data.overall_score - analysis.overall_score;
+          document.getElementById("atsDiff").textContent = (diff >= 0 ? "+" : "") + diff;
+        }
+      })
+      .catch(function() { recalcBtn.disabled = false; recalcBtn.textContent = "Recalculate ATS Score"; });
+    });
+  }
+
+  // ---- Save ----
+  var saveBtn = document.getElementById("saveBtn");
+  if (saveBtn) {
+    saveBtn.addEventListener("click", function() {
+      if (!resumeData.personal || !resumeData.personal.name) {
+        alert("Please enter your name before saving.");
+        return;
+      }
+      saveBtn.disabled = true;
+      saveBtn.textContent = "Saving...";
+      fetch("/api/resume-builder/save", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+          resume_data: resumeData,
+          job_title: (analysis && analysis.job_skills && analysis.job_skills[0]) ? analysis.job_skills[0].name : "Resume",
+          template: currentTemplate,
+          source_token: TOKEN || "",
+          existing_resume_id: savedResumeId || ""
+        })
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Save Resume";
+        if (data.ok) {
+          savedResumeId = data.resume_id || savedResumeId;
+          saveBtn.textContent = "Saved \u2713";
+          setTimeout(function() { saveBtn.textContent = "Save Resume"; }, 2000);
+        } else {
+          alert("Unable to save resume.");
+        }
+      })
+      .catch(function() {
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Save Resume";
+        alert("Unable to save resume.");
+      });
+    });
+  }
+
+  // ---- Reset ----
+  var resetBtn = document.getElementById("resetBtn");
+  if (resetBtn) {
+    resetBtn.addEventListener("click", function() {
+      if (!confirm("Reset all changes to the original resume?")) return;
+      resumeData = JSON.parse(JSON.stringify(originalData));
+      initPersonalEditor();
+      initSummaryEditor();
+      ["experience","projects","education","certifications","achievements","languages","links"].forEach(renderListSection);
+      renderSkills(); renderPreview(); updateProgress();
+      var scoreEl = document.getElementById("atsScoreDisplay");
+      if (scoreEl && analysis) scoreEl.textContent = analysis.overall_score + "%";
+      var origBox = document.getElementById("atsOriginalScore");
+      if (origBox) origBox.style.display = "none";
+    });
+  }
+
+  // ---- Download helper ----
+  function triggerDownload(blob, filename) {
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function() {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 200);
+  }
+
+  function getDownloadFilename(ext) {
+    var name = (resumeData.personal && resumeData.personal.name || "Resume").replace(/[^a-zA-Z0-9]/g, "_");
+    var role = "Resume";
+    if (analysis && analysis.job_skills && analysis.job_skills[0]) {
+      role = analysis.job_skills[0].name.replace(/[^a-zA-Z0-9]/g, "_");
+    }
+    return name + "_" + role + "_Resume." + ext;
+  }
+
+  function downloadFile(endpoint, ext, btn, originalText) {
+    if (!resumeData.personal || !resumeData.personal.name) {
+      alert("Please enter your name before downloading.");
+      return;
+    }
+    btn.disabled = true;
+    btn.textContent = "Generating...";
+    var payload = JSON.stringify({
+      resume_data: resumeData,
+      template: currentTemplate,
+      job_title: (analysis && analysis.job_skills && analysis.job_skills[0]) ? analysis.job_skills[0].name : "Resume"
+    });
+    fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: payload
+    })
+    .then(function(r) {
+      if (!r.ok) {
+        return r.json().then(function(err) {
+          throw new Error(err.error || "Server error (" + r.status + ")");
+        }).catch(function(e) {
+          if (e.message && e.message.indexOf("Server error") > -1) throw e;
+          throw new Error("Server returned error (" + r.status + ")");
+        });
+      }
+      return r.blob();
+    })
+    .then(function(blob) {
+      if (blob.size < 100) throw new Error("Generated file is too small.");
+      triggerDownload(blob, getDownloadFilename(ext));
+      btn.disabled = false;
+      btn.textContent = "Downloaded \u2713";
+      setTimeout(function() { btn.textContent = originalText; }, 2000);
+    })
+    .catch(function(err) {
+      btn.disabled = false;
+      btn.textContent = originalText;
+      alert("Download failed: " + (err.message || "Unknown error."));
+    });
+  }
+
+  var downloadPdfBtn = document.getElementById("downloadPdfBtn");
+  if (downloadPdfBtn) {
+    downloadPdfBtn.addEventListener("click", function() {
+      downloadFile("/api/resume-builder/download-pdf", "pdf", downloadPdfBtn, "Download PDF");
+    });
+  }
+
+  var downloadDocxBtn = document.getElementById("downloadDocxBtn");
+  if (downloadDocxBtn) {
+    downloadDocxBtn.addEventListener("click", function() {
+      downloadFile("/api/resume-builder/download-docx", "docx", downloadDocxBtn, "Download DOCX");
+    });
+  }
+
+})();
+</script>
+{% endblock %}

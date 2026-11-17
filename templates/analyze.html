@@ -1,0 +1,355 @@
+{% extends "base.html" %}
+{% block title %}Analyze Resume — TalentLens{% endblock %}
+
+{% block content %}
+<div class="container">
+  <header class="page-head">
+    <h1>Resume Analysis</h1>
+    <p>Upload your resume and paste the job description to get a full compatibility breakdown.</p>
+  </header>
+
+  <!-- Persisted session state banner -->
+  {% if session_data %}
+  <div class="session-banner" id="sessionBanner">
+    <div class="session-banner-inner">
+      <div class="session-banner-info">
+        <span class="session-banner-icon">📄</span>
+        <div class="session-banner-text">
+          <strong>Current Resume:</strong>
+          <span id="sessionFilename">{{ session_data.filename or 'Pasted text' }}</span>
+        </div>
+      </div>
+      <div class="session-banner-actions">
+        {% if session_data.token %}
+        <a class="btn btn-outline btn-sm" href="{{ url_for('results_page', token=session_data.token) }}">View Last Results</a>
+        {% endif %}
+        <button type="button" class="btn btn-ghost btn-sm" id="clearSessionBtn">Clear</button>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <form id="analyzeForm" class="grid grid-2" style="align-items:start" enctype="multipart/form-data" novalidate>
+    <div class="stack-2">
+      <div class="card" id="resumeCard">
+        {% if session_data %}
+        <!-- Show persisted state: current resume with replace option -->
+        <div class="persisted-resume" id="persistedResume">
+          <label class="form-label" style="font-size:1rem">Your Resume</label>
+          <div class="persisted-resume-display">
+            <span class="persisted-resume-icon">📄</span>
+            <span class="persisted-resume-name">{{ session_data.filename or 'Pasted text' }}</span>
+          </div>
+          <div class="persisted-resume-actions">
+            <button type="button" class="btn btn-outline btn-sm" id="replaceResumeBtn">Replace Resume</button>
+          </div>
+          <!-- Hidden file input and textarea (shown when Replace is clicked) -->
+          <div class="replace-area hidden" id="replaceArea">
+            <div class="dropzone" id="resumeDropzone">
+              <span class="dz-icon">📄</span>
+              <strong>Choose PDF or TXT</strong>
+              <span>Drag & drop or click to browse</span>
+              <input type="file" name="resume" accept=".pdf,.txt" id="resumeFile">
+              <span class="file-chip"></span>
+            </div>
+            <p class="form-hint">PDF is supported. Files are processed in memory and deleted after analysis — never stored.</p>
+            <div style="margin-top:0.75rem">
+              <label class="form-label" for="resumeText" style="font-size:0.9rem">Or Paste Resume Text</label>
+              <textarea name="resume_text" id="resumeText" placeholder="Paste your resume content here (optional if you uploaded a file)…" style="min-height:140px"></textarea>
+            </div>
+          </div>
+        </div>
+        {% else %}
+        <!-- Fresh upload state -->
+        <label class="form-label" style="font-size:1rem">Upload Your Resume</label>
+        <div class="dropzone" id="resumeDropzone">
+          <span class="dz-icon">📄</span>
+          <strong>Choose PDF or TXT</strong>
+          <span>Drag & drop or click to browse</span>
+          <input type="file" name="resume" accept=".pdf,.txt" id="resumeFile">
+          <span class="file-chip"></span>
+        </div>
+        <p class="form-hint">PDF is supported. Files are processed in memory and deleted after analysis — never stored.</p>
+
+        <div style="margin-top:0.75rem">
+          <label class="form-label" for="resumeText" style="font-size:0.9rem">Or Paste Resume Text</label>
+          <textarea name="resume_text" id="resumeText" placeholder="Paste your resume content here (optional if you uploaded a file)…" style="min-height:140px"></textarea>
+        </div>
+        <button type="button" class="btn btn-ghost btn-sm mt-2" id="loadSampleResume">Load sample resume</button>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card">
+      <label class="form-label" for="jobDescription" style="font-size:1rem">Paste Job Description</label>
+      <textarea name="job_description" id="jobDescription" required placeholder="Paste the full job posting here…">{{ session_data.job_description if session_data else '' }}</textarea>
+      <p class="form-hint">Required — the more complete the posting, the more accurate the analysis.</p>
+      <div class="sample-job-select-group mt-2">
+        <label class="form-label" for="sampleJobSelect" style="font-size:0.85rem; margin-bottom:0.35rem;">Sample Job Description</label>
+        <select id="sampleJobSelect" class="sample-job-select">
+          <option value="" disabled selected>Select a role</option>
+          <option value="data-analyst">Data Analyst</option>
+          <option value="data-scientist">Data Scientist</option>
+          <option value="ai-ml-engineer">AI/ML Engineer</option>
+          <option value="software-developer">Software Developer</option>
+          <option value="web-developer">Web Developer</option>
+          <option value="business-analyst">Business Analyst</option>
+          <option value="cybersecurity-analyst">Cybersecurity Analyst</option>
+          <option value="cloud-engineer">Cloud Engineer</option>
+          <option value="devops-engineer">DevOps Engineer</option>
+          <option value="ui-ux-designer">UI/UX Designer</option>
+          <option value="digital-marketing-specialist">Digital Marketing Specialist</option>
+          <option value="hr-manager">HR Manager</option>
+          <option value="finance-analyst">Finance Analyst</option>
+          <option value="project-manager">Project Manager</option>
+        </select>
+      </div>
+
+      <div class="alert alert-danger hidden mt-3" id="formError"></div>
+
+      <button type="submit" class="btn btn-primary btn-lg btn-block mt-3">Analyze Resume</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var sampleJobs = [
+      {
+        title: "Data Analyst",
+        description: "Analyze datasets to identify trends and business insights. Create reports and dashboards using SQL, Python, Excel, Power BI, or Tableau. Clean and transform data and communicate findings to stakeholders."
+      },
+      {
+        title: "Data Scientist",
+        description: "Collect and analyze complex datasets to solve business problems. Build predictive models using Python, SQL, statistics, and machine learning. Communicate insights and recommendations to stakeholders."
+      },
+      {
+        title: "AI/ML Engineer",
+        description: "Develop, train, and deploy machine learning and AI models. Work with Python, TensorFlow, PyTorch, Scikit-learn, and data processing tools. Build scalable AI solutions and optimize model performance."
+      },
+      {
+        title: "Software Developer",
+        description: "Design, develop, test, and maintain software applications. Write clean and efficient code using languages such as Java, Python, JavaScript, or C++. Collaborate with teams to build scalable software solutions."
+      },
+      {
+        title: "Web Developer",
+        description: "Develop responsive web applications using HTML, CSS, JavaScript, and modern frameworks such as React. Build frontend and backend functionality, integrate APIs, and ensure application performance."
+      },
+      {
+        title: "Business Analyst",
+        description: "Analyze business requirements and processes to identify opportunities for improvement. Gather stakeholder requirements, create documentation, analyze data, and support business decision-making."
+      },
+      {
+        title: "Cybersecurity Analyst",
+        description: "Monitor systems and networks for security threats and vulnerabilities. Investigate incidents, perform risk assessments, and implement security measures to protect organizational systems and data."
+      },
+      {
+        title: "Cloud Engineer",
+        description: "Design and manage cloud infrastructure using AWS, Azure, or Google Cloud. Deploy applications, automate cloud processes, manage resources, and ensure security and scalability."
+      },
+      {
+        title: "DevOps Engineer",
+        description: "Build and maintain CI/CD pipelines and automate software deployments. Work with Docker, Kubernetes, Git, cloud platforms, and infrastructure automation tools."
+      },
+      {
+        title: "UI/UX Designer",
+        description: "Design intuitive and visually appealing user experiences. Conduct user research, create wireframes and prototypes, and collaborate with developers to build user-friendly applications."
+      },
+      {
+        title: "Digital Marketing Specialist",
+        description: "Plan and execute digital marketing campaigns across social media, search engines, and email platforms. Analyze campaign performance and improve engagement and brand growth."
+      },
+      {
+        title: "HR Manager",
+        description: "Manage recruitment, employee relations, performance management, and HR policies. Support employee development and maintain a productive workplace environment."
+      },
+      {
+        title: "Finance Analyst",
+        description: "Analyze financial data, prepare reports and forecasts, monitor budgets, and support business decisions using financial models and performance metrics."
+      },
+      {
+        title: "Project Manager",
+        description: "Plan and manage projects from initiation to completion. Manage timelines, resources, stakeholders, risks, and ensure successful project delivery."
+      }
+    ];
+
+    var sampleJobsMap = {};
+    sampleJobs.forEach(function (job) {
+      sampleJobsMap[job.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")] = job.description;
+    });
+
+    var sampleResume = "Aarav Sharma\nData Science Intern\n\nTECHNICAL SKILLS\nPython, SQL, Pandas, NumPy, Matplotlib, Git, Machine Learning, Scikit-learn\n\nEDUCATION\nB.Tech Computer Science, 2025, GPA 3.8\n\nPROJECTS\nBuilt a house price prediction model using scikit-learn and achieved 85% accuracy. Deployed on GitHub. Created an EDA dashboard with Matplotlib.\n\nINTERNSHIP\nData Analyst Intern at TechCorp (6 months). Used Python and Excel to build weekly reports and improved dashboard refresh time by 30%.";
+
+    var jobSelect = document.getElementById("sampleJobSelect");
+    var resumeBtn = document.getElementById("loadSampleResume");
+    var jobBox = document.getElementById("jobDescription");
+    var resumeBox = document.getElementById("resumeText");
+
+    if (jobSelect) jobSelect.addEventListener("change", function () {
+      var key = this.value;
+      if (key && sampleJobsMap[key]) {
+        jobBox.value = sampleJobsMap[key];
+      }
+    });
+    if (resumeBtn) resumeBtn.addEventListener("click", function () { resumeBox.value = sampleResume; });
+
+    // Replace Resume button
+    var replaceBtn = document.getElementById("replaceResumeBtn");
+    var replaceArea = document.getElementById("replaceArea");
+    var persistedResume = document.getElementById("persistedResume");
+    if (replaceBtn && replaceArea) {
+      replaceBtn.addEventListener("click", function () {
+        replaceArea.classList.toggle("hidden");
+        this.textContent = replaceArea.classList.contains("hidden") ? "Replace Resume" : "Cancel";
+      });
+    }
+
+    // Clear session button
+    var clearBtn = document.getElementById("clearSessionBtn");
+    if (clearBtn) {
+      clearBtn.addEventListener("click", function () {
+        document.getElementById("sessionBanner").style.display = "none";
+        // Clear the job description textarea and reset the sample dropdown
+        var jdBox = document.getElementById("jobDescription");
+        if (jdBox) jdBox.value = "";
+        var jdSelect = document.getElementById("sampleJobSelect");
+        if (jdSelect) jdSelect.selectedIndex = 0;
+        // Show the fresh upload state
+        var persistedEl = document.getElementById("persistedResume");
+        if (persistedEl) {
+          // Replace the persisted view with a fresh upload form
+          persistedEl.innerHTML = '<label class="form-label" style="font-size:1rem">Upload Your Resume</label>'
+            + '<div class="dropzone" id="resumeDropzone">'
+            + '<span class="dz-icon">📄</span>'
+            + '<strong>Choose PDF or TXT</strong>'
+            + '<span>Drag & drop or click to browse</span>'
+            + '<input type="file" name="resume" accept=".pdf,.txt" id="resumeFile">'
+            + '<span class="file-chip"></span>'
+            + '</div>'
+            + '<p class="form-hint">PDF is supported. Files are processed in memory and deleted after analysis — never stored.</p>'
+            + '<div style="margin-top:0.75rem">'
+            + '<label class="form-label" for="resumeText" style="font-size:0.9rem">Or Paste Resume Text</label>'
+            + '<textarea name="resume_text" id="resumeText" placeholder="Paste your resume content here (optional if you uploaded a file)…" style="min-height:140px"></textarea>'
+            + '</div>'
+            + '<button type="button" class="btn btn-ghost btn-sm mt-2" id="loadSampleResume">Load sample resume</button>';
+          // Dropzone is auto-initialized by main.js
+          var newResumeBtn = document.getElementById("loadSampleResume");
+          if (newResumeBtn) newResumeBtn.addEventListener("click", function () {
+            document.getElementById("resumeText").value = sampleResume;
+          });
+        }
+        // Clear the session via a fetch call
+        fetch("/api/clear-session", { method: "POST" });
+      });
+    }
+
+    // Dropzones are initialized by main.js initDropzones()
+    // No need to re-initialize here — main.js handles all .dropzone elements
+  });
+</script>
+<style>
+  /* Session persistence banner */
+  .session-banner {
+    background: var(--primary-soft);
+    border: 1px solid var(--primary);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.25rem;
+  }
+  .session-banner-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .session-banner-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .session-banner-icon {
+    font-size: 1.1rem;
+  }
+  .session-banner-text {
+    font-size: 0.88rem;
+    color: var(--text);
+  }
+  .session-banner-text strong {
+    color: var(--primary);
+  }
+  .session-banner-actions {
+    display: flex;
+    gap: 0.4rem;
+    flex-shrink: 0;
+  }
+
+  /* Persisted resume display */
+  .persisted-resume-display {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .persisted-resume-icon {
+    font-size: 1.2rem;
+  }
+  .persisted-resume-name {
+    font-weight: 600;
+    font-size: 0.92rem;
+    color: var(--text);
+  }
+  .persisted-resume-actions {
+    margin-bottom: 0.5rem;
+  }
+  .replace-area.hidden {
+    display: none;
+  }
+  .hidden {
+    display: none !important;
+  }
+
+  /* Sample job description select */
+  .sample-job-select-group {
+    display: flex;
+    flex-direction: column;
+  }
+  .sample-job-select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 5l3 3 3-3'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.85rem center;
+    padding-right: 2.5rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .sample-job-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px var(--primary-soft);
+  }
+  .sample-job-select option {
+    background: var(--surface);
+    color: var(--text);
+    padding: 0.5rem;
+  }
+</style>
+{% endblock %}

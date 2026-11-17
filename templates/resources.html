@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}Learning Resources — TalentLens{% endblock %}
+
+{% block content %}
+<div class="container">
+  <header class="page-head">
+    <h1>Skill Resources</h1>
+    <p>Search curated learning materials for any skill — documentation, videos, articles and courses.</p>
+  </header>
+
+  <div class="card mb-4">
+    <form id="resourceSearch" class="flex-between" novalidate>
+      <input type="text" id="resourceQuery" placeholder="Search a skill, e.g. Power BI" value="{{ skill or '' }}" style="flex:1; min-width:200px">
+      <button type="submit" class="btn btn-primary">Search Resources</button>
+    </form>
+    <div class="alert alert-danger hidden mt-2" id="resourceError"></div>
+  </div>
+
+  {% if skill %}
+  <h2 class="mb-3" style="font-size:1.4rem">Resources for <span class="gradient-text">{{ skill }}</span></h2>
+  {% endif %}
+
+  <div id="resourceResults">
+    {% if resources %}
+      {% set ns = namespace(last_type="") %}
+      {% for r in resources %}
+        {% if r.resource_type != ns.last_type %}
+          {% set ns.last_type = r.resource_type %}
+          {% if not loop.first %}</div>{% endif %}
+          <h4 class="eyebrow" style="margin-top:1.5rem">{{ r.resource_type }}</h4>
+          <div class="stack">
+        {% endif %}
+        <div class="resource-item">
+          <div class="meta">
+            <strong>{{ r.title }}</strong>
+            {{ r.provider }} · {{ r.difficulty }}
+          </div>
+          <a class="btn btn-sm btn-outline" href="{{ r.url }}" target="_blank" rel="noopener noreferrer">
+            {% if r.resource_type == "Documentation" %}Open Documentation
+            {% elif r.resource_type == "Video" %}Watch Tutorial
+            {% elif r.resource_type == "Article" %}Read Article
+            {% else %}Open Resource{% endif %}
+          </a>
+        </div>
+      {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var form = document.getElementById("resourceSearch");
+    var query = document.getElementById("resourceQuery");
+    var results = document.getElementById("resourceResults");
+    var errorBox = document.getElementById("resourceError");
+    if (!form) return;
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var q = query.value.trim();
+      if (!q) { errorBox.textContent = "Please enter a skill to search."; errorBox.classList.remove("hidden"); return; }
+      errorBox.classList.add("hidden");
+      fetch("/api/resources/search?q=" + encodeURIComponent(q))
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          if (data.results && data.results.length) {
+            var groups = {};
+            data.results.forEach(function (r) {
+              var type = r.resource_type;
+              (groups[type] = groups[type] || []).push(r);
+            });
+            var order = ["Documentation", "Course", "Article", "Video", "Playlist"];
+            var html = '<h2 class="mb-3" style="font-size:1.4rem">Results for <span class="gradient-text">' + escapeHtml(data.query) + "</span></h2>";
+            order.forEach(function (type) {
+              if (!groups[type]) return;
+              html += '<h4 class="eyebrow" style="margin-top:1.5rem">' + type + "</h4><div class='stack'>";
+              groups[type].forEach(function (r) {
+                var action = type === "Documentation" ? "Open Documentation" : type === "Video" ? "Watch Tutorial" : type === "Article" ? "Read Article" : "Open Resource";
+                html += '<div class="resource-item"><div class="meta"><strong>' + escapeHtml(r.title) + "</strong>" + escapeHtml(r.provider) + " · " + escapeHtml(r.difficulty) + '</div><a class="btn btn-sm btn-outline" target="_blank" rel="noopener noreferrer" href="' + escapeHtml(r.url) + '">' + action + "</a></div>";
+              });
+              html += "</div>";
+            });
+            results.innerHTML = html;
+          } else {
+            results.innerHTML = '<div class="alert alert-warning">No resources found for "' + escapeHtml(q) + '". Try a different spelling or a related skill.</div>';
+          }
+        })
+        .catch(function () {
+          errorBox.textContent = "Search failed. Please try again.";
+          errorBox.classList.remove("hidden");
+        });
+    });
+  });
+
+  function escapeHtml(str) {
+    var div = document.createElement("div");
+    div.textContent = String(str == null ? "" : str);
+    return div.innerHTML;
+  }
+</script>
+{% endblock %}
